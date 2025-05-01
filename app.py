@@ -50,3 +50,32 @@ def get_fixtures(league_name, year, month, status_filter="all"):
         fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] == "NS"]
 
     return fixtures
+
+from elo import calculate_elo_history
+import pandas as pd
+import streamlit as st
+
+# Seçilen maçtan takımları al
+if selected_fixture:
+    team_home = selected_fixture["teams"]["home"]["name"]
+    team_away = selected_fixture["teams"]["away"]["name"]
+    league_id = selected_fixture["league"]["id"]
+
+    # Elo geçmişini hesapla
+    history, _ = calculate_elo_history(fixtures, selected_league_id=league_id)
+
+    # Seçilen iki takımın geçmişini çıkar
+    team_home_history = history.get(team_home, [])
+    team_away_history = history.get(team_away, [])
+
+    # Veriyi DataFrame’e çevir
+    df_home = pd.DataFrame(team_home_history, columns=["date", team_home])
+    df_away = pd.DataFrame(team_away_history, columns=["date", team_away])
+
+    # Tarihe göre birleştir
+    df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
+    df_elo.set_index("date", inplace=True)
+
+    # Grafik göster
+    st.subheader("📊 Elo Puan Grafiği")
+    st.line_chart(df_elo)
