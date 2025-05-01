@@ -1,3 +1,7 @@
+import sys
+sys.path.append('/mount/src/kup10cu')  # form.py dosyasının bulunduğu dizin
+
+from form import get_team_last_matches  # form.py'yi import et
 
 import streamlit as st
 import pandas as pd
