@@ -26,14 +26,10 @@ standings = get_standings(league_name, year)
 if standings:
     table = standings[0]['league']['standings'][0]
     df_standings = pd.DataFrame([{
-        "Sıra": team['rank'],
         "Takım": team['team']['name'],
-        "O": team['all']['played'],
         "G": team['all']['win'],
         "B": team['all']['draw'],
         "M": team['all']['lose'],
-        "A": team['all']['goals']['for'],
-        "Y": team['all']['goals']['against'],
         "AV": team['goalsDiff'],
         "P": team['points']
     } for team in table])
