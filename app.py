@@ -1,7 +1,7 @@
-import sys
-sys.path.append('/mount/src/kup10cu')  # form.py dosyasının bulunduğu dizin
 
-from form import get_team_last_matches  # form.py'yi import et
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))  # form.py'nin bulunduğu dizini ekle
 
 import streamlit as st
 import pandas as pd
@@ -25,79 +25,68 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 # 4. Maç durumu seçimi
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# 👉 Tüm sezonun maçlarını çekiyoruz
-season_fixtures = get_fixtures(league_name, year)
+# 5. Maçları çek
+fixtures = get_fixtures(league_name, year, month, status_filter)
 
-# Ay ve maç durumu filtresi
-fixtures = [
-f for f in season_fixtures
-if f["fixture"]["date"][5:7] == str(month).zfill(2)
-and (
-status_filter == "all"
-or (status_filter == "played" and f["fixture"]["status"]["short"] in ["FT", "AET", "PEN"])
-or (status_filter == "upcoming" and f["fixture"]["status"]["short"] == "NS")
-)
-]
-
-# 5. Maç seçimi
+# 6. Maç seçimi
 if fixtures:
-  match_options = [
-  f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
-for f in fixtures
-]
-selected_match = st.selectbox("Maç seçin", match_options)
-selected_fixture = fixtures[match_options.index(selected_match)]
+    match_options = [
+        f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
+        for f in fixtures
+    ]
+    selected_match = st.selectbox("Maç seçin", match_options)
+    selected_fixture = fixtures[match_options.index(selected_match)]
 
-# Elo grafiği sezonun tamamına göre
-team_home = selected_fixture["teams"]["home"]["name"]
-team_away = selected_fixture["teams"]["away"]["name"]
-league_id = selected_fixture["league"]["id"]
+    # Elo grafiği
+    team_home = selected_fixture["teams"]["home"]["name"]
+    team_away = selected_fixture["teams"]["away"]["name"]
+    league_id = selected_fixture["league"]["id"]
 
-history, _ = calculate_elo_history(season_fixtures, selected_league_id=league_id)
-team_home_history = history.get(team_home, [])
-team_away_history = history.get(team_away, [])
+    history, _ = calculate_elo_history(fixtures, selected_league_id=league_id)
+    team_home_history = history.get(team_home, [])
+    team_away_history = history.get(team_away, [])
 
-df_home = pd.DataFrame(team_home_history, columns=["date", team_home])
-df_away = pd.DataFrame(team_away_history, columns=["date", team_away])
+    df_home = pd.DataFrame(team_home_history, columns=["date", team_home])
+    df_away = pd.DataFrame(team_away_history, columns=["date", team_away])
 
-df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
-df_elo.set_index("date", inplace=True)
-df_elo.ffill(inplace=True)
+    df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
+    df_elo.set_index("date", inplace=True)
+    df_elo.ffill(inplace=True)
 
-# 📊 Plotly çizgi grafiği
-st.subheader("📊 Elo Puan Grafiği")
-min_val = df_elo.min().min()
-max_val = df_elo.max().max()
+    # 📊 Plotly çizgi grafiği
+    st.subheader("📊 Elo Puan Grafiği")
+    min_val = df_elo.min().min()
+    max_val = df_elo.max().max()
 
-fig = go.Figure()
-for team in df_elo.columns:
-  fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
+    fig = go.Figure()
+    for team in df_elo.columns:
+        fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
 
-  fig.update_layout(
-  title="Elo Puan Grafiği",
-  xaxis_title="Tarih",
-  yaxis_title="Elo Puanı",
-  yaxis=dict(range=[min_val - 10, max_val + 10]),
-  template="plotly_white"
-)
+    fig.update_layout(
+        title="Elo Puan Grafiği",
+        xaxis_title="Tarih",
+        yaxis_title="Elo Puanı",
+        yaxis=dict(range=[min_val - 10, max_val + 10]),
+        template="plotly_white"
+    )
 
-  st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
+
+    # 📋 Son 5 Maç – Gol Dakikaları
+    st.subheader("📋 Son 5 Maç – Gol Dakikaları")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown(f"### {team_home}")
+        summaries = get_team_last_matches(fixtures, team_home)
+        for line in summaries:
+            st.text(line)
+
+    with col2:
+        st.markdown(f"### {team_away}")
+        summaries = get_team_last_matches(fixtures, team_away)
+        for line in summaries:
+            st.text(line)
 else:
-  st.warning("Seçilen filtrelere göre maç bulunamadı.")
-
-# 📋 Son 5 maç – Form durumu
-st.subheader("📋 Son 5 Maç – Form ve Goller")
-
-col1, col2 = st.columns(2)
-
-with col1:
-  st.markdown(f"### {team_home}")
-  summaries = get_team_last_matches(season_fixtures, team_home)
-  for line in summaries:
-    st.text(line)
-
-with col2:
-  st.markdown(f"### {team_away}")
-  summaries = get_team_last_matches(season_fixtures, team_away)
-  for line in summaries:
-    st.text(line)
+    st.warning("Seçilen filtrelere göre maç bulunamadı.")
