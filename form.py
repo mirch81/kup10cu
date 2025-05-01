@@ -2,12 +2,10 @@ from api import get_fixture_events
 import streamlit as st
 
 def get_goal_minutes(events, team_name):
-    if not events:
-        return []
     goal_minutes = []
     for e in events:
         if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name:
-            minute = e.get('time', {}).get('minute')
+            minute = e.get('time', {}).get('elapsed')
             if minute is not None:
                 goal_minutes.append(minute)
     return goal_minutes
