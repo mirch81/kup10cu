@@ -16,16 +16,9 @@ def load_match_with_events(fixture_id):
 def get_goal_minutes(events, team_name):
     if not events:
         return []  # Eğer events boşsa boş liste döndür
-
-    # Debug: events'i kontrol et
-    st.write("🔍 Events:", events)
-
-    # Gol dakikalarını alırken daha güvenli bir şekilde kontrol edelim
-    return [
-        e['time']['minute']
-        for e in events
-        if e.get('type') == 'Goal' and 'team' in e and e['team'].get('name') == team_name
-    ]
+    
+    # Events içinde 'team' objesinin her zaman olduğundan emin olalım
+    return [e['time']['minute'] for e in events if 'team' in e and e['type'] == 'Goal' and e['team']['name'] == team_name]
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
