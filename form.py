@@ -17,11 +17,14 @@ def get_goal_minutes(events, team_name):
     if not events:
         return []  # Eğer events boşsa boş liste döndür
 
-    # 'time' objesinin ve 'team' objesinin olduğunu kontrol edelim
+    # Debug: events'i kontrol et
+    st.write("🔍 Events:", events)
+
+    # Gol dakikalarını alırken daha güvenli bir şekilde kontrol edelim
     return [
         e['time']['minute']
         for e in events
-        if e.get('type') == 'Goal' and 'team' in e and e['team'].get('name') == team_name and 'time' in e
+        if e.get('type') == 'Goal' and 'team' in e and e['team'].get('name') == team_name
     ]
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
@@ -66,12 +69,15 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
+        # İlk yarı skoru event'lerden hesapla
+        team_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == team_name and e['time']['elapsed'] <= 45])
+        opp_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == opponent and e['time']['elapsed'] <= 45])
+
         summary = f"{date} – vs {opponent} {result_icon}"
-        summary += f"\nMS: {team_goals}-{opp_goals}"
+        summary += f"\nİY: {team_first_half_goals}-{opp_first_half_goals} / MS: {team_goals}-{opp_goals}"
 
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
-
         if team_goals_min:
             summary += f"\n🥅 {team_name}: " + ', '.join(str(g) + "'" for g in team_goals_min)
         if opp_goals_min:
