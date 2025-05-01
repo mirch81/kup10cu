@@ -78,8 +78,8 @@ for team in df_elo.columns:
 )
 
 st.plotly_chart(fig, use_container_width=True)
-else:
-st.warning("Seçilen filtrelere göre maç bulunamadı.")
+  else:
+    st.warning("Seçilen filtrelere göre maç bulunamadı.")
 
 # 📋 Son 5 maç – Form durumu
 st.subheader("📋 Son 5 Maç – Form ve Goller")
