@@ -51,7 +51,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # Font büyüklüğünü 2px küçültüyoruz
+        # HTML etiketlerini doğru şekilde render etmek için markdown'da unsafe_allow_html=True kullanıyoruz
         summary = f"<div style='font-weight:bold; font-size:23px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
         st.markdown(summary, unsafe_allow_html=True)
 
@@ -60,13 +60,13 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         
         # Gol atan takımların isimlerini kalın yapıyoruz
         if team_goals_list:
-            st.markdown(f"**🥅 {home_name}:**")
+            st.markdown(f"**🥅 {home_name}:**", unsafe_allow_html=True)
             for g in team_goals_list:
-                st.markdown(g)
+                st.markdown(g, unsafe_allow_html=True)
         if opp_goals_list:
-            st.markdown(f"**🥅 {away_name}:**")
+            st.markdown(f"**🥅 {away_name}:**", unsafe_allow_html=True)
             for g in opp_goals_list:
-                st.markdown(g)
+                st.markdown(g, unsafe_allow_html=True)
 
         result.append(summary)
 
