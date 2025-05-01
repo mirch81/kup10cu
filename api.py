@@ -1,8 +1,9 @@
+
 import requests
 from datetime import datetime
 from config import BASE_URL, HEADERS
 
-# Desteklenen ligler ve isimleri eşleştirme
+# Desteklenen ligler ve API-Football lig ID'leri
 SUPPORTED_LEAGUES = {
     "Premier League": 39,
     "La Liga": 140,
@@ -20,7 +21,12 @@ def get_fixtures(league_name, year, month, status_filter="all"):
     if not league_id:
         return []
 
-    # Başlangıç ve bitiş tarihlerini belirle
+    # Avrupa liglerinde sezon = yıl, diğerlerinde sezon = yıl - 1 olabilir
+    if league_id in [2, 3, 848]:  # Avrupa kupaları
+        season = year
+    else:
+        season = year - 1  # Ligler genelde sezonu bir önceki yıldan başlatır
+
     start_date = f"{year}-{str(month).zfill(2)}-01"
     if int(month) == 12:
         end_date = f"{int(year)+1}-01-01"
@@ -30,7 +36,7 @@ def get_fixtures(league_name, year, month, status_filter="all"):
     url = f"{BASE_URL}/fixtures"
     params = {
         "league": league_id,
-        "season": year,
+        "season": season,
         "from": start_date,
         "to": end_date
     }
@@ -38,11 +44,10 @@ def get_fixtures(league_name, year, month, status_filter="all"):
     response = requests.get(url, headers=HEADERS, params=params)
     data = response.json()
 
-    # Oynanmış / oynanmamış filtrelemesi
     fixtures = data.get("response", [])
     if status_filter == "played":
         fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] in ["FT", "AET", "PEN"]]
     elif status_filter == "upcoming":
-        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] in ["NS"]]
+        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] == "NS"]
 
     return fixtures
