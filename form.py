@@ -1,9 +1,8 @@
-
 from collections import defaultdict
 
 def get_goal_minutes(events, team_name):
     if not events:
-        return []  # Eğer events boşsa boş liste döndür
+        return []
     return [e['time']['minute'] for e in events if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name]
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
@@ -36,7 +35,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             team_goals = away_goals
             opp_goals = home_goals
 
-        # Maç sonucu simgesi
+        # Sonuç simgesi
         if team_goals > opp_goals:
             result_icon = "✅"
         elif team_goals < opp_goals:
@@ -44,10 +43,10 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # Gösterimde tarih, takım ismi ve rakip ismini kalın yapacağız
+        # Başlık satırı
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
-        # Gol dakikalarını alt satıra yazalım
+        # Gol dakikaları
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
         if team_goals_min:
