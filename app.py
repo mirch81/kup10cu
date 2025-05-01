@@ -276,6 +276,7 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
         summaries = get_team_last_matches(all_fixtures, team_home)
         for line in summaries:
             st.markdown(line, unsafe_allow_html=True)
+        st.markdown("---")
 
     with col2:
         st.markdown(f"### {team_away}")
