@@ -26,10 +26,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
-        if events:
-        st.code(events[:3], language="json")  # İlk 3 event'i JSON olarak göster
-
         st.warning(f"🧪 {match['fixture']['date'][:10]} – {team_name} vs {match['teams']['home']['name']} / {match['teams']['away']['name']} | Fixture ID: {fixture_id} | Events: {len(events)}")
+        if events:
+            st.code(events[:3], language="json")
 
         home = match['teams']['home']
         away = match['teams']['away']
