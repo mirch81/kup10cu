@@ -87,13 +87,13 @@ st.subheader("📋 Son 5 Maç – Form ve Goller")
 col1, col2 = st.columns(2)
 
 with col1:
-st.markdown(f"### {team_home}")
-summaries = get_team_last_matches(season_fixtures, team_home)
-for line in summaries:
-st.text(line)
+  st.markdown(f"### {team_home}")
+  summaries = get_team_last_matches(season_fixtures, team_home)
+  for line in summaries:
+    st.text(line)
 
 with col2:
-st.markdown(f"### {team_away}")
-summaries = get_team_last_matches(season_fixtures, team_away)
-for line in summaries:
-st.text(line)
+  st.markdown(f"### {team_away}")
+  summaries = get_team_last_matches(season_fixtures, team_away)
+  for line in summaries:
+    st.text(line)
