@@ -2,6 +2,10 @@ import requests
 from datetime import datetime
 from config import BASE_URL, HEADERS
 
+import streamlit as st
+st.title("⚽ Tahmin Asistanı Başladı!")
+
+
 # Desteklenen ligler ve API ID'leri
 SUPPORTED_LEAGUES = {
     "Premier League": 39,
