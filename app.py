@@ -1,3 +1,4 @@
+
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -7,18 +8,16 @@ import pandas as pd
 import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
-from form import get_team_last_matches, get_form_score
+from form import get_team_last_matches, get_form_score, get_first_half_form_score
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
-# Lig seçimi
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
 year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# Fikstür çekme
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
@@ -34,7 +33,6 @@ if monthly_fixtures:
     team_away = selected_fixture["teams"]["away"]["name"]
     league_id = selected_fixture["league"]["id"]
 
-    # Elo hesaplama
     history, _ = calculate_elo_history(all_fixtures, selected_league_id=league_id)
     team_home_history = history.get(team_home, [])
     team_away_history = history.get(team_away, [])
@@ -46,7 +44,6 @@ if monthly_fixtures:
     df_elo.set_index("date", inplace=True)
     df_elo.ffill(inplace=True)
 
-    # Elo Grafiği
     st.subheader("📊 Elo Puan Grafiği")
     min_val = df_elo.min().min()
     max_val = df_elo.max().max()
@@ -64,7 +61,7 @@ if monthly_fixtures:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # 🔮 Tahmin Skoru (Elo + Form)
+    # Tahmin motoru - Maç Sonucu
     form_home = get_form_score(all_fixtures, team_home)
     form_away = get_form_score(all_fixtures, team_away)
 
@@ -84,7 +81,24 @@ if monthly_fixtures:
     else:
         st.markdown("**Tahmin: Beraberlik**")
 
-    # Son 5 Maç
+    # Tahmin motoru - İlk Yarı Sonucu
+    st.subheader("⏱ İlk Yarı Sonucu Tahmini")
+
+    iy_home = get_first_half_form_score(all_fixtures, team_home)
+    iy_away = get_first_half_form_score(all_fixtures, team_away)
+    iy_weight = 10
+
+    iy_score_home = elo_home + iy_home * iy_weight
+    iy_score_away = elo_away + iy_away * iy_weight
+
+    if iy_score_home > iy_score_away:
+        st.markdown(f"**Tahmin: İlk Yarıyı {team_home} önde kapatır**")
+    elif iy_score_home < iy_score_away:
+        st.markdown(f"**Tahmin: İlk Yarıyı {team_away} önde kapatır**")
+    else:
+        st.markdown("**Tahmin: İlk Yarı Berabere**")
+
+    # Son 5 maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
 
     col1, col2 = st.columns(2)
