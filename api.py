@@ -1,35 +1,48 @@
-import streamlit as st
-st.write("API Key:", st.secrets["api"]["key"])
+import requests
+from datetime import datetime
+from config import BASE_URL, HEADERS
 
-import streamlit as st
-from api import get_fixtures, SUPPORTED_LEAGUES
+# Desteklenen ligler ve API ID'leri
+SUPPORTED_LEAGUES = {
+    "Premier League": 39,
+    "La Liga": 140,
+    "Bundesliga": 78,
+    "Serie A": 135,
+    "Ligue 1": 61,
+    "Süper Lig": 203,
+    "Şampiyonlar Ligi": 2,
+    "Avrupa Ligi": 3,
+    "Konferans Ligi": 848
+}
 
-# Sayfa başlığı
-st.title("⚽ Futbol Tahmin Asistanı")
+def get_fixtures(league_name, year, month, status_filter="all"):
+    league_id = SUPPORTED_LEAGUES.get(league_name)
+    if not league_id:
+        return []
 
-# 1. Lig seçimi
-league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
+    # Başlangıç ve bitiş tarihi ayarla
+    start_date = f"{year}-{str(month).zfill(2)}-01"
+    if int(month) == 12:
+        end_date = f"{int(year)+1}-01-01"
+    else:
+        end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
 
-# 2. Yıl seçimi
-year = st.selectbox("Yıl seçin", list(range(2020, 2025))[::-1])  # 2024 → 2020
+    url = f"{BASE_URL}/fixtures"
+    params = {
+        "league": league_id,
+        "season": year,
+        "from": start_date,
+        "to": end_date
+    }
 
-# 3. Ay seçimi
-month = st.selectbox("Ay seçin", list(range(1, 13)))
+    response = requests.get(url, headers=HEADERS, params=params)
+    data = response.json()
 
-# 4. Maç durumu
-status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
+    # Oynanmış / oynanmamış filtreleme
+    fixtures = data.get("response", [])
+    if status_filter == "played":
+        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] in ["FT", "AET", "PEN"]]
+    elif status_filter == "upcoming":
+        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] == "NS"]
 
-# 5. Maçları API'den çek
-fixtures = get_fixtures(league_name, year, month, status_filter)
-
-# 6. Maç seçimi
-if fixtures:
-    match_options = [
-        f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
-        for f in fixtures
-    ]
-    selected_match = st.selectbox("Maç seçin", match_options)
-    selected_fixture = fixtures[match_options.index(selected_match)]
-else:
-    st.warning("Seçilen filtrelere göre maç bulunamadı.")
-    selected_fixture = None
+    return fixtures
