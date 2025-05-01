@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
+from form import get_team_last_matches
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
@@ -79,3 +80,20 @@ if fixtures:
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
+
+# 📋 Son 5 maç – Form durumu
+st.subheader("📋 Son 5 Maç – Form ve Goller")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(f"### {team_home}")
+    summaries = get_team_last_matches(season_fixtures, team_home)
+    for line in summaries:
+        st.text(line)
+
+with col2:
+    st.markdown(f"### {team_away}")
+    summaries = get_team_last_matches(season_fixtures, team_away)
+    for line in summaries:
+        st.text(line)
