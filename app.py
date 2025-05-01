@@ -85,8 +85,8 @@ if monthly_fixtures:
     with st.container():
         st.markdown(f"""
         **Maç Sonucu Tahmini:**  
-        {team_home} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_home:.1f}`  
-        {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
+        {team_home} Elo ve Son 5 Maç Sonucu Skor: {elo_home:.1f} ELO {'+' if form_score_home >= 0 else '-'} {abs(form_score_home):.1f} form puanı = `{tahmin_skor_home:.1f}`  
+        {team_away} Elo ve Son 5 Maç Sonucu Skor: {elo_away:.1f} ELO {'+' if form_score_away >= 0 else '-'} {abs(form_score_away):.1f} form puanı = `{tahmin_skor_away:.1f}`
         """)
         if tahmin_skor_home > tahmin_skor_away:
             st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
