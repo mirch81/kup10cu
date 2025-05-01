@@ -17,10 +17,7 @@ def get_goal_minutes(events, team_name):
     if not events:
         return []  # Eğer events boşsa boş liste döndür
 
-    # Debug: events'i kontrol et
-    st.write("🔍 Events:", events)
-
-    # Gol dakikalarını alırken daha güvenli bir şekilde kontrol edelim
+    # Gol dakikalarını güvenli bir şekilde alalım, sadece "Goal" türündekileri
     return [
         e['time']['minute']
         for e in events
