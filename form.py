@@ -1,14 +1,15 @@
 from api import get_fixture_events
 import streamlit as st
 
-def get_goal_minutes(events, team_name):
-    goal_minutes = []
+def get_team_goals(events, team_name):
+    goals = []
     for e in events:
         if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name:
             minute = e.get('time', {}).get('elapsed')
+            scorer = e.get('player', {}).get('name', 'Bilinmiyor')
             if minute is not None:
-                goal_minutes.append(minute)
-    return goal_minutes
+                goals.append(f"- {minute}' {scorer}")
+    return goals
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
@@ -54,12 +55,12 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
 
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
-        team_goals_min = get_goal_minutes(events, team_name)
-        opp_goals_min = get_goal_minutes(events, opponent)
-        if team_goals_min:
-            summary += f"\n🥅 {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
-        if opp_goals_min:
-            summary += f"\n🥅 {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
+        team_goals_list = get_team_goals(events, team_name)
+        opp_goals_list = get_team_goals(events, opponent)
+        if team_goals_list:
+            summary += f"\n🥅 {team_name}:\n" + "\n".join(team_goals_list)
+        if opp_goals_list:
+            summary += f"\n🥅 {opponent}:\n" + "\n".join(opp_goals_list)
 
         result.append(summary)
 
