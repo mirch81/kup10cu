@@ -1,10 +1,10 @@
+
 from collections import defaultdict
 import math
 
-K = 30  # Sabit K faktörü
+K = 30
 
-# Avrupa turnuva lig ID'leri (API-Football)
-EUROPEAN_LEAGUE_IDS = {2, 3, 848}  # ŞL, Avrupa Ligi, Konferans Ligi
+EUROPEAN_LEAGUE_IDS = {2, 3, 848}
 
 def expected_score(elo_a, elo_b):
     return 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
@@ -22,18 +22,17 @@ def update_elo(elo_a, elo_b, score_a, score_b):
     return elo_a + change, elo_b - change
 
 def calculate_elo_history(fixtures, selected_league_id):
-    """
-    Lig maçları için sadece lig maçlarını,
-    Avrupa turnuvaları için hem lig hem Avrupa maçlarını hesaba katar.
-    """
     elo = defaultdict(lambda: 1500)
     history = defaultdict(list)
+    initialized = set()
 
-    for match in sorted(fixtures, key=lambda x: x["fixture"]["date"]):
+    sorted_fixtures = sorted(fixtures, key=lambda x: x["fixture"]["date"])
+    if not sorted_fixtures:
+        return history, elo
+
+    for match in sorted_fixtures:
         league_id = match["league"]["id"]
         
-        # ŞL, Avrupa, Konferans için: lig + Avrupa maçları → dahil edilir
-        # Diğer ligler için: sadece kendi lig maçları dahil edilir
         if selected_league_id not in EUROPEAN_LEAGUE_IDS and league_id != selected_league_id:
             continue
 
@@ -42,21 +41,23 @@ def calculate_elo_history(fixtures, selected_league_id):
         home_goals = match["goals"]["home"]
         away_goals = match["goals"]["away"]
 
-        # Skor verisi yoksa geç
         if home_goals is None or away_goals is None:
             continue
 
+        date = match["fixture"]["date"][:10]
+
+        for team in [home, away]:
+            if team not in initialized:
+                history[team].append((date, 1500))
+                initialized.add(team)
+
         old_home_elo = elo[home]
         old_away_elo = elo[away]
-
         new_home_elo, new_away_elo = update_elo(old_home_elo, old_away_elo, home_goals, away_goals)
 
-        # Güncelle
         elo[home] = new_home_elo
         elo[away] = new_away_elo
 
-        # Tarihi not al
-        date = match["fixture"]["date"][:10]
         history[home].append((date, new_home_elo))
         history[away].append((date, new_away_elo))
 
