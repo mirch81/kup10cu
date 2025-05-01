@@ -1,7 +1,7 @@
 
 import streamlit as st
 import pandas as pd
-import altair as alt
+import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
 
@@ -47,21 +47,24 @@ if fixtures:
     df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
     df_elo.set_index("date", inplace=True)
 
-    # 📊 Dinamik ölçekli Altair grafiği
+    # 📊 Plotly çizgi grafiği
     st.subheader("📊 Elo Puan Grafiği")
+
     min_val = df_elo.min().min()
     max_val = df_elo.max().max()
 
-    chart = (
-        alt.Chart(df_elo.reset_index().melt('date'))
-        .mark_line()
-        .encode(
-            x='date:T',
-            y=alt.Y('value:Q', scale=alt.Scale(domain=[min_val - 10, max_val + 10])),
-            color='variable:N'
-        )
-        .properties(width=700, height=400)
+    fig = go.Figure()
+    for team in df_elo.columns:
+        fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
+
+    fig.update_layout(
+        title="Elo Puan Grafiği",
+        xaxis_title="Tarih",
+        yaxis_title="Elo Puanı",
+        yaxis=dict(range=[min_val - 10, max_val + 10]),
+        template="plotly_white"
     )
-    st.altair_chart(chart, use_container_width=True)
+
+    st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
