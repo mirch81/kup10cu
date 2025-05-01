@@ -145,6 +145,7 @@ with st.container():
     # Son 5 maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
 
+   if monthly_fixtures:
     col1, col2 = st.columns(2)
 
     with col1:
@@ -158,5 +159,6 @@ with st.container():
         summaries = get_team_last_matches(all_fixtures, team_away)
         for line in summaries:
             st.markdown(line, unsafe_allow_html=True)
+
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
