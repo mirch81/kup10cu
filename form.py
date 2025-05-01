@@ -25,9 +25,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
-       
-        if events:
-            st.code(events[:3], language="json")
+    
 
         home = match['teams']['home']
         away = match['teams']['away']
