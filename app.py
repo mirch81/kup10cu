@@ -97,3 +97,4 @@ with col2:
     summaries = get_team_last_matches(season_fixtures, team_away)
     for line in summaries:
         st.text(line)
+
