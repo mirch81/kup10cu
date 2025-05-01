@@ -37,8 +37,8 @@ or (status_filter == "upcoming" and f["fixture"]["status"]["short"] == "NS")
 
 # 5. Maç seçimi
 if fixtures:
-match_options = [
-f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
+  match_options = [
+  f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
 for f in fixtures
 ]
 selected_match = st.selectbox("Maç seçin", match_options)
