@@ -283,6 +283,6 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
         summaries = get_team_last_matches(all_fixtures, team_away)
         for line in summaries:
             st.markdown(line, unsafe_allow_html=True)
+        st.markdown("---")
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
-        st.markdown("---")
