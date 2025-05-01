@@ -88,13 +88,14 @@ if monthly_fixtures:
         {team_home} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_home:.1f}`  
         {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
         """)
-        if abs(tahmin_skor_home - tahmin_skor_away) < 15:
-    st.markdown("➡️ Tahmin: **Beraberlik**")
-elif tahmin_skor_home > tahmin_skor_away:
-    st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
-else:
-    st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
-st.markdown("---")
+        if tahmin_skor_home > tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+        elif tahmin_skor_home < tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
+        else:
+                st.markdown("➡️ Tahmin: **Beraberlik**")
+
+        st.markdown("---")
 
         st.markdown(f"""
         **İlk Yarı Sonucu Tahmini:**  
@@ -102,13 +103,13 @@ st.markdown("---")
         {team_away} Skor: `{iy_score_away:.1f}`
         """)
 
-        if abs(iy_score_home - iy_score_away) < 15:
-    st.markdown("➡️ Tahmin: **İlk yarı berabere**")
-elif iy_score_home > iy_score_away:
-    st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
-else:
-    st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
-st.markdown("---")
+        if iy_score_home > iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+        elif iy_score_home < iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
+        else:
+                st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+        st.markdown("---")
 
         gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
         gol_away, mac_away = get_team_avg_goals(all_fixtures, team_away)
@@ -125,7 +126,7 @@ st.markdown("---")
 
         **Maç Ortalama:** `{match_avg:.2f}`
         """)
-st.markdown("---")
+        st.markdown("---")
 
         kg_home = get_btts_ratio(all_fixtures, team_home)
         kg_away = get_btts_ratio(all_fixtures, team_away)
@@ -139,14 +140,15 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
         if kg_avg > 0.5:
             st.markdown("➡️ Tahmin: **KG VAR**")
         else:
-            st.markdown("➡️ Tahmin: **KG YOK**")
+                st.markdown("➡️ Tahmin: **KG YOK**")
 
 
         if match_avg > 2.5:
             st.markdown("➡️ Tahmin: **2.5 ÜST**")
         else:
-            st.markdown("➡️ Tahmin: **2.5 ALT**")
-st.markdown("---")
+                st.markdown("➡️ Tahmin: **2.5 ALT**")
+
+        st.markdown("---")
 
         
 
