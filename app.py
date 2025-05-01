@@ -78,3 +78,4 @@ if monthly_fixtures:
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
 get_team_last_matches(all_fixtures, team_home)
+get_team_last_matches(all_fixtures, team_away)
