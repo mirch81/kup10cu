@@ -1,4 +1,4 @@
-from collections import defaultdict
+from api import get_fixture_events
 
 def get_goal_minutes(events, team_name):
     if not events:
@@ -17,6 +17,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
 
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
+        fixture_id = match['fixture']['id']
+        events = get_fixture_events(fixture_id)
+
         home = match['teams']['home']
         away = match['teams']['away']
         home_name = home['name']
@@ -24,7 +27,6 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         home_goals = match['goals']['home']
         away_goals = match['goals']['away']
         date = match['fixture']['date'][:10]
-        events = match.get('events', [])
 
         if team_name == home_name:
             opponent = away_name
@@ -35,7 +37,6 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             team_goals = away_goals
             opp_goals = home_goals
 
-        # Sonuç simgesi
         if team_goals > opp_goals:
             result_icon = "✅"
         elif team_goals < opp_goals:
@@ -43,10 +44,8 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # Başlık satırı
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
-        # Gol dakikaları
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
         if team_goals_min:
