@@ -75,12 +75,12 @@ if monthly_fixtures:
         st.markdown(f"### {team_home}")
         summaries = get_team_last_matches(all_fixtures, team_home)
         for line in summaries:
-            st.markdown(line, unsafe_allow_html=True)
+            st.markdown(line)
 
     with col2:
         st.markdown(f"### {team_away}")
         summaries = get_team_last_matches(all_fixtures, team_away)
         for line in summaries:
-            st.markdown(line, unsafe_allow_html=True)
+            st.markdown(line)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
