@@ -42,19 +42,18 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # İlk yarı skoru hesapla (event'lerden)
-        team_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == team_name and e['time']['elapsed'] <= 45])
-        opp_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == opponent and e['time']['elapsed'] <= 45])
-
         summary = f"{date} – vs {opponent} {result_icon}"
-        summary += f"\nİY: {team_first_half_goals}-{opp_first_half_goals} / MS: {team_goals}-{opp_goals}"
+        summary += f"
+MS: {team_goals}-{opp_goals}"
 
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
         if team_goals_min:
-            summary += f"\n🥅 {team_name}: " + ', '.join(str(g) + "'" for g in team_goals_min)
+            summary += f"
+🥅 {team_name}: " + ', '.join(str(g) + "'" for g in team_goals_min)
         if opp_goals_min:
-            summary += f"\n🥅 {opponent}: " + ', '.join(str(g) + "'" for g in opp_goals_min)
+            summary += f"
+🥅 {opponent}: " + ', '.join(str(g) + "'" for g in opp_goals_min)
 
         result.append(summary)
 
