@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
-from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches
+from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches, get_team_avg_goals
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
@@ -109,6 +109,29 @@ if monthly_fixtures:
             st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
         else:
             st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+        st.markdown("---")
+
+        gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
+        gol_away, mac_away = get_team_avg_goals(all_fixtures, team_away)
+        match_avg = (mac_home + mac_away) / 2
+
+        st.markdown(f"""
+        **2.5 Alt/Üst Tahmini:**
+
+        {team_home}'ın attığı Gol Ortalaması: `{gol_home:.2f}`  
+        {team_home} Maçlarındaki Toplam Gol Ortalaması: `{mac_home:.2f}`  
+
+        {team_away}'ın attığı Gol Ortalaması: `{gol_away:.2f}`  
+        {team_away} Maçlarındaki Toplam Gol Ortalaması: `{mac_away:.2f}`  
+
+        **Maç Ortalama:** `{match_avg:.2f}`
+        """)
+
+        if match_avg > 2.5:
+            st.markdown("➡️ Tahmin: **2.5 ÜST**")
+        else:
+            st.markdown("➡️ Tahmin: **2.5 ALT**")
+
         st.markdown("---")
 
         avg_goals_home = get_avg_goals_last_matches(all_fixtures, team_home)
