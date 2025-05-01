@@ -48,13 +48,13 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         # Gösterimde tarih, takım ismi ve rakip ismini kalın yapacağız
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
-        # Gol dakikalarını alt satıra yazalım
-        team_goals_min = get_goal_minutes(events, team_name)
-        opp_goals_min = get_goal_minutes(events, opponent)
-        if team_goals_min:
-            summary += f"\n🥅 {team_name}: " + ', '.join(str(g) + "'" for g in team_goals_min)
-        if opp_goals_min:
-            summary += f"\n🥅 {opponent}: " + ', '.join(str(g) + "'" for g in opp_goals_min)
+# Gol dakikalarını alt satıra yazalım
+team_goals_min = get_goal_minutes(events, team_name)
+opp_goals_min = get_goal_minutes(events, opponent)
+if team_goals_min:
+    summary += f"\n🥅 {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
+if opp_goals_min:
+    summary += f"\n🥅 {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
 
         result.append(summary)
 
