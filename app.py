@@ -11,7 +11,7 @@ st.title("⚽ Futbol Tahmin Asistanı")
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
 
 # 2. Yıl seçimi
-year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
+year = st.selectbox("Yıl seçin", list(range(2024, 2026))[::-1])
 
 # 3. Ay seçimi
 month = st.selectbox("Ay seçin", list(range(1, 13)))
