@@ -57,9 +57,14 @@ html_code = f"""
     .compact-table th {{
         background-color: #f0f2f6;
     }}
+
+    .compact-table {{
+        background-color: white;
+    }}
 </style>
 
-<div style="display: flex; justify-content: center;">
+
+<div style="display: flex; justify-content: center; background-color: white;">
 <table class="compact-table">
 <thead>
 <tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
