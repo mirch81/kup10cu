@@ -37,7 +37,7 @@ if standings:
         "P": team['points']
     } for team in table])
 
-    st.markdown("<h3 style='text-align: center;'>📋 Lig Puan Durumu</h3>", unsafe_allow_html=True)
+    st.subheader("📋 Lig Puan Durumu")
     
 import streamlit.components.v1 as components
 
@@ -50,7 +50,7 @@ html_code = f"""
         border-collapse: collapse;
     }}
     .compact-table td, .compact-table th {{
-        padding: 6px 8px;
+        padding: 6px 12px;
         text-align: center;
         white-space: nowrap;
     }}
