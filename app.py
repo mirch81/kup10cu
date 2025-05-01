@@ -132,12 +132,10 @@ if monthly_fixtures:
         kg_away = get_btts_ratio(all_fixtures, team_away)
         kg_avg = (kg_home + kg_away) / 2
 
-        st.markdown(f"""
-        **Karşılıklı Gol (KG) Tahmini:**  
-        {team_home} Son 5 Maçta KG: `{kg_home * 100:.0f}%`  
-        {team_away} Son 5 Maçta KG: `{kg_away * 100:.0f}%`  
-        Ortalama: `{kg_avg * 100:.0f}%`
-        """)
+        st.markdown(f"""**Karşılıklı Gol (KG) Tahmini:**
+{team_home} Son 5 Maçta KG: `{kg_home * 100:.0f}%`
+{team_away} Son 5 Maçta KG: `{kg_away * 100:.0f}%`
+Ortalama: `{kg_avg * 100:.0f}%`""")
 
         if kg_avg > 0.5:
             st.markdown("➡️ Tahmin: **KG VAR**")
