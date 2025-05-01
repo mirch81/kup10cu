@@ -141,7 +141,7 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
             st.markdown("➡️ Tahmin: **KG VAR**")
         else:
             st.markdown("➡️ Tahmin: **KG YOK**")
-)
+
 
         if match_avg > 2.5:
             st.markdown("➡️ Tahmin: **2.5 ÜST**")
