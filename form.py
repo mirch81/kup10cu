@@ -52,9 +52,8 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             result_icon = "🤝"
 
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
-        result.append(summary)
+        st.markdown(summary)
 
-        # Gol tablosu gösterimi
         team_goals_list = get_team_goals(events, team_name)
         opp_goals_list = get_team_goals(events, opponent)
 
@@ -65,5 +64,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         if opp_goals_list:
             st.markdown(f"**🥅 {opponent} Golleri**")
             st.table(pd.DataFrame(opp_goals_list))
+
+        result.append(summary)
 
     return result
