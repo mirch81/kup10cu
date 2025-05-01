@@ -12,8 +12,6 @@ def get_team_goals(events, team_name):
     return goals
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
-    result = []
-
     played_matches = [
         f for f in fixtures
         if f['goals']['home'] is not None and f['goals']['away'] is not None
@@ -64,7 +62,3 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             st.markdown(f"**🥅 {away_name} Golleri**")
             for g in opp_goals_list:
                 st.markdown(g)
-
-        result.append(summary)
-
-    return result
