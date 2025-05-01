@@ -134,22 +134,7 @@ if monthly_fixtures:
 
         st.markdown("---")
 
-        avg_goals_home = get_avg_goals_last_matches(all_fixtures, team_home)
-        avg_goals_away = get_avg_goals_last_matches(all_fixtures, team_away)
-        match_avg_goals = (avg_goals_home + avg_goals_away) / 2
-
-        st.markdown(f"""
-        **2.5 Alt/Üst Tahmini:**  
-        {team_home} Ort: `{avg_goals_home:.2f}`  
-        {team_away} Ort: `{avg_goals_away:.2f}`  
-        Maç Ortalama: `{match_avg_goals:.2f}`
-        """)
-
-        if match_avg_goals > 2.5:
-            st.markdown("➡️ Tahmin: **2.5 ÜST**")
-        else:
-            st.markdown("➡️ Tahmin: **2.5 ALT**")
-
+        
 
     # Son 5 maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
