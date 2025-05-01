@@ -132,3 +132,23 @@ def get_first_half_form_score(fixtures, team_name, max_matches=5):
         count += 1
 
     return score / count if count else 0
+
+
+def get_avg_goals_last_matches(fixtures, team_name, max_matches=5):
+    total_goals = 0
+    count = 0
+
+    played_matches = [
+        f for f in fixtures
+        if f['goals']['home'] is not None and f['goals']['away'] is not None
+        and (f['teams']['home']['name'] == team_name or f['teams']['away']['name'] == team_name)
+    ]
+
+    sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
+
+    for match in sorted_matches:
+        total = match['goals']['home'] + match['goals']['away']
+        total_goals += total
+        count += 1
+
+    return total_goals / count if count > 0 else 0
