@@ -3,15 +3,13 @@ from api import get_fixture_events
 def get_goal_minutes(events, team_name):
     if not events:
         return []
-    return [
-        e['time']['minute']
-        for e in events
-        if (
-            e.get('type') == 'Goal'
-            and e.get('team', {}).get('name') == team_name
-            and e.get('time', {}).get('minute') is not None
-        )
-    ]
+    goal_minutes = []
+    for e in events:
+        if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name:
+            minute = e.get('time', {}).get('minute')
+            if minute is not None:
+                goal_minutes.append(minute)
+    return goal_minutes
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
@@ -27,8 +25,6 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
-        print(f"🧪 {match['fixture']['date'][:10]} – {team_name} vs {match['teams']['home']['name']} / {match['teams']['away']['name']} – Event sayısı: {len(events)}")
-
 
         home = match['teams']['home']
         away = match['teams']['away']
@@ -59,9 +55,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
         if team_goals_min:
-            summary += f"\n {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
+            summary += f"\n🥅 {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
         if opp_goals_min:
-            summary += f"\n {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
+            summary += f"\n🥅 {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
 
         result.append(summary)
 
