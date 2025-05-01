@@ -25,20 +25,21 @@ monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 standings = get_standings(league_name, year)
 if standings:
     table = standings[0]['league']['standings'][0]
-    df_standings = pd.DataFrame([
-    {
-        "Takım": team.get('team', {}).get('name', ''),
-        "G": team.get('all', {}).get('win', 0),
-        "B": team.get('all', {}).get('draw', 0),
-        "M": team.get('all', {}).get('lose', 0),
-        "AV": team.get('goalsDiff', 0),
-        "P": team.get('points', 0)
-    }
-    for team in table if team.get('team')
-])
+    df_standings = pd.DataFrame([{
+        "Sıra": team['rank'],
+        "Takım": team['team']['name'],
+        "O": team['all']['played'],
+        "G": team['all']['win'],
+        "B": team['all']['draw'],
+        "M": team['all']['lose'],
+        "A": team['all']['goals']['for'],
+        "Y": team['all']['goals']['against'],
+        "AV": team['goalsDiff'],
+        "P": team['points']
+    } for team in table])
 
     st.subheader("📋 Lig Puan Durumu")
-    st.dataframe(df_standings)
+    st.table(df_standings)
 
 if monthly_fixtures:
     match_options = [
