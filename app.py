@@ -1,6 +1,7 @@
 
 import streamlit as st
 import pandas as pd
+import altair as alt
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
 
@@ -11,7 +12,7 @@ st.title("⚽ Futbol Tahmin Asistanı")
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
 
 # 2. Yıl seçimi
-year = st.selectbox("Yıl seçin", list(range(2024, 2026))[::-1])
+year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 
 # 3. Ay seçimi
 month = st.selectbox("Ay seçin", list(range(1, 13)))
@@ -46,7 +47,21 @@ if fixtures:
     df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
     df_elo.set_index("date", inplace=True)
 
+    # 📊 Dinamik ölçekli Altair grafiği
     st.subheader("📊 Elo Puan Grafiği")
-    st.line_chart(df_elo)
+    min_val = df_elo.min().min()
+    max_val = df_elo.max().max()
+
+    chart = (
+        alt.Chart(df_elo.reset_index().melt('date'))
+        .mark_line()
+        .encode(
+            x='date:T',
+            y=alt.Y('value:Q', scale=alt.Scale(domain=[min_val - 10, max_val + 10])),
+            color='variable:N'
+        )
+        .properties(width=700, height=400)
+    )
+    st.altair_chart(chart, use_container_width=True)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
