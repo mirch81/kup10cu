@@ -126,11 +126,6 @@ if monthly_fixtures:
 
         **Maç Ortalama:** `{match_avg:.2f}`
         """)
-                if match_avg > 2.5:
-            st.markdown("➡️ Tahmin: **2.5 ÜST**")
-        else:
-            st.markdown("➡️ Tahmin: **2.5 ALT**")
-
         st.markdown("---")
 
         kg_home = get_btts_ratio(all_fixtures, team_home)
@@ -148,6 +143,10 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
             st.markdown("➡️ Tahmin: **KG YOK**")
 
 
+        if match_avg > 2.5:
+            st.markdown("➡️ Tahmin: **2.5 ÜST**")
+        else:
+            st.markdown("➡️ Tahmin: **2.5 ALT**")
 
         st.markdown("---")
 
