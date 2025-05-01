@@ -73,17 +73,6 @@ if monthly_fixtures:
     tahmin_skor_home = elo_home + form_home * form_weight
     tahmin_skor_away = elo_away + form_away * form_weight
 
-    st.subheader("🔮 Maç Sonucu Tahmini")
-    if tahmin_skor_home > tahmin_skor_away:
-        st.markdown(f"**Tahmin: {team_home} kazanır**")
-    elif tahmin_skor_home < tahmin_skor_away:
-        st.markdown(f"**Tahmin: {team_away} kazanır**")
-    else:
-        st.markdown("**Tahmin: Beraberlik**")
-
-    # Tahmin motoru - İlk Yarı Sonucu
-    st.subheader("⏱ İlk Yarı Sonucu Tahmini")
-
     iy_home = get_first_half_form_score(all_fixtures, team_home)
     iy_away = get_first_half_form_score(all_fixtures, team_away)
     iy_weight = 10
@@ -91,12 +80,36 @@ if monthly_fixtures:
     iy_score_home = elo_home + iy_home * iy_weight
     iy_score_away = elo_away + iy_away * iy_weight
 
-    if iy_score_home > iy_score_away:
-        st.markdown(f"**Tahmin: İlk Yarıyı {team_home} önde kapatır**")
-    elif iy_score_home < iy_score_away:
-        st.markdown(f"**Tahmin: İlk Yarıyı {team_away} önde kapatır**")
-    else:
-        st.markdown("**Tahmin: İlk Yarı Berabere**")
+    st.subheader("🔮 Tahminler")
+
+    with st.container():
+        st.markdown(f"**Maç Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{tahmin_skor_home:.1f}`  
+"
+                    f"{team_away} Skor: `{tahmin_skor_away:.1f}`")
+
+        if tahmin_skor_home > tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+        elif tahmin_skor_home < tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
+        else:
+            st.markdown("➡️ Tahmin: **Beraberlik**")
+
+        st.markdown("---")
+
+        st.markdown(f"**İlk Yarı Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{iy_score_home:.1f}`  
+"
+                    f"{team_away} Skor: `{iy_score_away:.1f}`")
+
+        if iy_score_home > iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+        elif iy_score_home < iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
+        else:
+            st.markdown("➡️ Tahmin: **İlk yarı berabere**")
 
     # Son 5 maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
