@@ -17,12 +17,13 @@ def get_goal_minutes(events, team_name):
     if not events:
         return []  # Eğer events boşsa boş liste döndür
 
-    # Gol dakikalarını güvenli bir şekilde alalım, sadece "Goal" türündekileri
+    # 'time' objesinin ve 'team' objesinin olduğunu kontrol edelim
     return [
         e['time']['minute']
         for e in events
-        if e.get('type') == 'Goal' and 'team' in e and e['team'].get('name') == team_name
+        if e.get('type') == 'Goal' and 'team' in e and e['team'].get('name') == team_name and 'time' in e
     ]
+
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
