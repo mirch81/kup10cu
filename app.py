@@ -117,15 +117,15 @@ if monthly_fixtures:
 
         st.markdown(f"""
         **2.5 Alt/Üst Tahmini:**
-
+        
         {team_home}'ın attığı Gol Ortalaması: `{gol_home:.2f}`  
         {team_home} Maçlarındaki Toplam Gol Ortalaması: `{mac_home:.2f}`  
-
+        
         {team_away}'ın attığı Gol Ortalaması: `{gol_away:.2f}`  
         {team_away} Maçlarındaki Toplam Gol Ortalaması: `{mac_away:.2f}`  
-
+        
         **Maç Ortalama:** `{match_avg:.2f}`
-        """
+        """)
         st.markdown("---")
 
         kg_home = get_btts_ratio(all_fixtures, team_home)
