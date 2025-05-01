@@ -26,6 +26,10 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
 
+        import streamlit as st
+st.warning(f"🧪 {date} – {team_name} vs {opponent} | Fixture ID: {fixture_id} | Events: {len(events)}")
+
+
         home = match['teams']['home']
         away = match['teams']['away']
         home_name = home['name']
