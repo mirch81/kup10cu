@@ -1,5 +1,6 @@
 from api import get_fixture_events
 import streamlit as st
+import pandas as pd
 
 def get_team_goals(events, team_name):
     goals = []
@@ -8,10 +9,12 @@ def get_team_goals(events, team_name):
             minute = e.get('time', {}).get('elapsed')
             scorer = e.get('player', {}).get('name', 'Bilinmiyor')
             if minute is not None:
-                goals.append(f"{minute}' {scorer}")
+                goals.append({"Dakika": f"{minute}'", "Oyuncu": scorer})
     return goals
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
+    result = []
+
     played_matches = [
         f for f in fixtures
         if f['goals']['home'] is not None and f['goals']['away'] is not None
@@ -48,25 +51,19 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        summary = f"<div style='font-weight:bold; font-size:20px'>{date} – {home_name} vs {away_name} {result_icon} | MS: {home_goals}-{away_goals}</div>"
-        st.markdown(summary, unsafe_allow_html=True)
+        summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
+        result.append(summary)
 
-        team_goals_list = get_team_goals(events, home_name)
-        opp_goals_list = get_team_goals(events, away_name)
+        # Gol tablosu gösterimi
+        team_goals_list = get_team_goals(events, team_name)
+        opp_goals_list = get_team_goals(events, opponent)
 
-        # Kolonlar: solda ev sahibi, sağda deplasman takımı
-        col1, col2 = st.columns([2, 2])
+        if team_goals_list:
+            st.markdown(f"**🥅 {team_name} Golleri**")
+            st.table(pd.DataFrame(team_goals_list))
 
-        with col1:
-            if team_goals_list:
-                st.markdown(f"**🥅 {home_name} Golleri**")
-                for g in team_goals_list:
-                    st.markdown(g)
+        if opp_goals_list:
+            st.markdown(f"**🥅 {opponent} Golleri**")
+            st.table(pd.DataFrame(opp_goals_list))
 
-        with col2:
-            if opp_goals_list:
-                st.markdown(f"**🥅 {away_name} Golleri**")
-                for g in opp_goals_list:
-                    st.markdown(g)
-
-    return True
+    return result
