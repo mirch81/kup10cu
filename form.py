@@ -63,3 +63,41 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         result.append(full_html)
 
     return result
+def get_form_score(fixtures, team_name, max_matches=5):
+    score = 0
+    count = 0
+
+    played_matches = [
+        f for f in fixtures
+        if f['goals']['home'] is not None and f['goals']['away'] is not None
+        and (f['teams']['home']['name'] == team_name or f['teams']['away']['name'] == team_name)
+    ]
+
+    sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
+
+    for match in sorted_matches:
+        home = match['teams']['home']
+        away = match['teams']['away']
+        home_name = home['name']
+        away_name = away['name']
+        home_goals = match['goals']['home']
+        away_goals = match['goals']['away']
+
+        if team_name == home_name:
+            team_goals = home_goals
+            opp_goals = away_goals
+        else:
+            team_goals = away_goals
+            opp_goals = home_goals
+
+        if team_goals > opp_goals:
+            score += 3
+        elif team_goals == opp_goals:
+            score += 1
+
+        count += 1
+
+    if count == 0:
+        return 0
+
+    return score / count
