@@ -112,13 +112,11 @@ with st.container():
         st.markdown("➡️ Tahmin: **İlk yarı berabere**")
 
     with st.container():
-       st.markdown(f"""
-        **Maç Sonucu Tahmini:**
-
-        {team_home} → `{elo_home:.1f}` Elo + `{form_home:.1f}` Form × `{form_weight}` = **`{tahmin_skor_home:.1f}`**  
-        {team_away} → `{elo_away:.1f}` Elo + `{form_away:.1f}` Form × `{form_weight}` = **`{tahmin_skor_away:.1f}`**
-        """)
-
+        st.markdown(f"**Maç Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{tahmin_skor_home:.1f}`  
+"
+                    f"{team_away} Skor: `{tahmin_skor_away:.1f}`")
 
         if tahmin_skor_home > tahmin_skor_away:
             st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
@@ -129,13 +127,11 @@ with st.container():
 
         st.markdown("---")
 
-        st.markdown(f"""
-        **İlk Yarı Sonucu Tahmini:**
-
-        {team_home} Skor: `{iy_score_home:.1f}`  
-        {team_away} Skor: `{iy_score_away:.1f}`
-        """)
-
+        st.markdown(f"**İlk Yarı Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{iy_score_home:.1f}`  
+"
+                    f"{team_away} Skor: `{iy_score_away:.1f}`")
 
         if iy_score_home > iy_score_away:
             st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
