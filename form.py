@@ -45,7 +45,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         result_icon = "✅" if team_goals > opp_goals else "❌" if team_goals < opp_goals else "🤝"
 
         # Bu satır sadece string olarak dönecek, Streamlit'e yazdırmayacak
-        summary = f"<div style='font-weight:bold; font-size:20px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
+        summary = f"<br><div style='font-weight:bold; font-size:20px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
 
         # Gol dakikalarını da append edelim
         goal_info = ""
