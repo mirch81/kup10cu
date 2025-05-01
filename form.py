@@ -69,7 +69,4 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
                 for g in opp_goals_list:
                     st.markdown(g)
 
-        # Gol dakikaları alt kısımda
-        st.markdown("")
-
     return True
