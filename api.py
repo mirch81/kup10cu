@@ -1,9 +1,8 @@
 
 import requests
-from datetime import datetime
 from config import BASE_URL, HEADERS
 
-# Desteklenen ligler ve API-Football lig ID'leri
+# Lig ID'leri
 SUPPORTED_LEAGUES = {
     "Premier League": 39,
     "La Liga": 140,
@@ -16,30 +15,32 @@ SUPPORTED_LEAGUES = {
     "Konferans Ligi": 848
 }
 
-def get_fixtures(league_name, year, month, status_filter="all"):
+def get_fixtures(league_name, year, month=None, status_filter="all"):
     league_id = SUPPORTED_LEAGUES.get(league_name)
     if not league_id:
         return []
 
-    # Avrupa liglerinde sezon = yıl, diğerlerinde sezon = yıl - 1 olabilir
-    if league_id in [2, 3, 848]:  # Avrupa kupaları
+    # Avrupa kupaları için sezon = yıl, ligler için sezon = yıl - 1
+    if league_id in [2, 3, 848]:
         season = year
     else:
-        season = year - 1  # Ligler genelde sezonu bir önceki yıldan başlatır
-
-    start_date = f"{year}-{str(month).zfill(2)}-01"
-    if int(month) == 12:
-        end_date = f"{int(year)+1}-01-01"
-    else:
-        end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
+        season = year - 1
 
     url = f"{BASE_URL}/fixtures"
     params = {
         "league": league_id,
-        "season": season,
-        "from": start_date,
-        "to": end_date
+        "season": season
     }
+
+    # Eğer ay girildiyse tarih aralığı ekle
+    if month:
+        start_date = f"{year}-{str(month).zfill(2)}-01"
+        if int(month) == 12:
+            end_date = f"{int(year)+1}-01-01"
+        else:
+            end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
+        params["from"] = start_date
+        params["to"] = end_date
 
     response = requests.get(url, headers=HEADERS, params=params)
     data = response.json()
