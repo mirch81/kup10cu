@@ -1,4 +1,7 @@
 import streamlit as st
+st.write("API Key:", st.secrets["api"]["key"])
+
+import streamlit as st
 from api import get_fixtures, SUPPORTED_LEAGUES
 
 # Sayfa başlığı
