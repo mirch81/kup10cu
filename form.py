@@ -3,7 +3,15 @@ from api import get_fixture_events
 def get_goal_minutes(events, team_name):
     if not events:
         return []
-    return [e['time']['minute'] for e in events if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name]
+    return [
+        e['time']['minute']
+        for e in events
+        if (
+            e.get('type') == 'Goal'
+            and e.get('team', {}).get('name') == team_name
+            and e.get('time', {}).get('minute') is not None
+        )
+    ]
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
