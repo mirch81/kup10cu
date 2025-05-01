@@ -62,5 +62,3 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             st.markdown(f"**🥅 {away_name} Golleri**")
             for g in opp_goals_list:
                 st.markdown(g)
-
-    return True
