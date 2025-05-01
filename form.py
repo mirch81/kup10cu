@@ -43,8 +43,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             result_icon = "🤝"
 
         # Gösterimde tarih, takım ismi ve rakip ismini kalın yapacağız
-        summary = f"**{date} – {team_name} vs {opponent}** {result_icon}"
-        summary += f"\nMS: {team_goals}-{opp_goals}"
+        summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
         team_goals_min = get_goal_minutes(events, team_name)
         opp_goals_min = get_goal_minutes(events, opponent)
