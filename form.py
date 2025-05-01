@@ -54,8 +54,8 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         team_goals_list = get_team_goals(events, home_name)
         opp_goals_list = get_team_goals(events, away_name)
 
-        # Sağ ve sol kolonları eşitlemek için kolona eşit paylar verelim
-        col1, col2, col3 = st.columns([2, 1, 2])
+        # Kolonlar: solda ev sahibi, sağda deplasman takımı
+        col1, col2 = st.columns([2, 2])
 
         with col1:
             if team_goals_list:
@@ -64,15 +64,10 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
                     st.markdown(g)
 
         with col2:
-            st.markdown(f"**🥅 {away_name} Golleri**")
-            if opp_goals_list:
-                for g in opp_goals_list:
-                    st.markdown(g)
-
-        with col3:
             if opp_goals_list:
                 st.markdown(f"**🥅 {away_name} Golleri**")
                 for g in opp_goals_list:
                     st.markdown(g)
 
     return True
+    
