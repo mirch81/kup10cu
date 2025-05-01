@@ -7,7 +7,7 @@ def get_team_goals(events, team_name):
         if e.get('type') == 'Goal' and e.get('team', {}).get('name') == team_name:
             minute = e.get('time', {}).get('elapsed')
             scorer = e.get('player', {}).get('name', 'Bilinmiyor')
-            if minute is not None:
+        if minute is not None:
                 goals.append(f"- {minute}' {scorer}")
     return goals
 
