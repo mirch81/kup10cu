@@ -51,19 +51,26 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
-        st.markdown(summary)
+        summary = f"**{date} – {home_name} vs {away_name}** {result_icon} | MS: {home_goals}-{away_goals}"
 
-        team_goals_list = get_team_goals(events, team_name)
-        opp_goals_list = get_team_goals(events, opponent)
+        team_goals_list = get_team_goals(events, home_name)
+        opp_goals_list = get_team_goals(events, away_name)
 
-        if team_goals_list:
-            st.markdown(f"**🥅 {team_name} Golleri**")
-            st.table(pd.DataFrame(team_goals_list))
+        df_home = pd.DataFrame(team_goals_list) if team_goals_list else pd.DataFrame(columns=["Dakika", "Oyuncu"])
+        df_away = pd.DataFrame(opp_goals_list) if opp_goals_list else pd.DataFrame(columns=["Dakika", "Oyuncu"])
 
-        if opp_goals_list:
-            st.markdown(f"**🥅 {opponent} Golleri**")
-            st.table(pd.DataFrame(opp_goals_list))
+        col1, col2, col3 = st.columns([1.5, 2, 1.5])
+
+        with col1:
+            st.markdown(f"#### 🥅 {home_name} Golleri")
+            st.table(df_home)
+
+        with col2:
+            st.markdown(summary)
+
+        with col3:
+            st.markdown(f"#### 🥅 {away_name} Golleri")
+            st.table(df_away)
 
         result.append(summary)
 
