@@ -143,9 +143,9 @@ with st.container():
             st.markdown("➡️ Tahmin: **İlk yarı berabere**")
 
     # Son 5 maç
-    st.subheader("📋 Son 5 Maç – Gol Dakikaları")
+    st.subheader("📍 Son 5 Maç – Gol Dakikaları")
 
-   if monthly_fixtures:
+if monthly_fixtures:
     col1, col2 = st.columns(2)
 
     with col1:
