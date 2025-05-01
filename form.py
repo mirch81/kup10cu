@@ -1,6 +1,5 @@
 from api import get_fixture_events
 import streamlit as st
-import pandas as pd
 
 def get_team_goals(events, team_name):
     goals = []
@@ -9,7 +8,7 @@ def get_team_goals(events, team_name):
             minute = e.get('time', {}).get('elapsed')
             scorer = e.get('player', {}).get('name', 'Bilinmiyor')
             if minute is not None:
-                goals.append({"Dakika": f"{minute}'", "Oyuncu": scorer})
+                goals.append(f"- {minute}' {scorer}")
     return goals
 
 def get_team_last_matches(fixtures, team_name, max_matches=5):
@@ -26,6 +25,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
+        st.warning(f"🧪 {match['fixture']['date'][:10]} – {team_name} vs {match['teams']['home']['name']} / {match['teams']['away']['name']} | Fixture ID: {fixture_id} | Events: {len(events)}")
+        if events:
+            st.code(events[:3], language="json")
 
         home = match['teams']['home']
         away = match['teams']['away']
@@ -52,18 +54,14 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             result_icon = "🤝"
 
         summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
-        result.append(summary)
 
-        # Gol tablosu gösterimi
         team_goals_list = get_team_goals(events, team_name)
         opp_goals_list = get_team_goals(events, opponent)
-
         if team_goals_list:
-            st.markdown(f"**🥅 {team_name} Golleri**")
-            st.table(pd.DataFrame(team_goals_list))
-
+            summary += f"\n🥅 {team_name}:\n" + "\n".join(team_goals_list)
         if opp_goals_list:
-            st.markdown(f"**🥅 {opponent} Golleri**")
-            st.table(pd.DataFrame(opp_goals_list))
+            summary += f"\n🥅 {opponent}:\n" + "\n".join(opp_goals_list)
+
+        result.append(summary)
 
     return result
