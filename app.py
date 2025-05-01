@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from api import get_fixtures, SUPPORTED_LEAGUES
+from api import get_fixtures, SUPPORTED_LEAGUES, get_standings
 from elo import calculate_elo_history
 from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches, get_team_avg_goals, get_btts_ratio
 
@@ -20,6 +20,26 @@ status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
+
+
+standings = get_standings(league_name, year)
+if standings:
+    table = standings[0]['league']['standings'][0]
+    df_standings = pd.DataFrame([{
+        "Sıra": team['rank'],
+        "Takım": team['team']['name'],
+        "O": team['all']['played'],
+        "G": team['all']['win'],
+        "B": team['all']['draw'],
+        "M": team['all']['lose'],
+        "A": team['all']['goals']['for'],
+        "Y": team['all']['goals']['against'],
+        "AV": team['goalsDiff'],
+        "P": team['points']
+    } for team in table])
+
+    st.subheader("📋 Lig Puan Durumu")
+    st.dataframe(df_standings)
 
 if monthly_fixtures:
     match_options = [
