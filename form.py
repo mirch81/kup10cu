@@ -25,6 +25,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
+        st.warning(f"🧪 {match['fixture']['date'][:10]} – {team_name} vs {match['teams']['home']['name']} / {match['teams']['away']['name']} | Fixture ID: {fixture_id} | Events: {len(events)}")
+        if events:
+            st.code(events[:3], language="json")
 
         home = match['teams']['home']
         away = match['teams']['away']
@@ -50,20 +53,14 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {home_goals}-{away_goals}"
+        summary = f"**{date} – {team_name} vs {opponent}** {result_icon} | MS: {team_goals}-{opp_goals}"
 
-        team_goals_list = get_team_goals(events, home_name)
-        opp_goals_list = get_team_goals(events, away_name)
+        team_goals_list = get_team_goals(events, team_name)
+        opp_goals_list = get_team_goals(events, opponent)
         if team_goals_list:
-            summary += f"
-🥅 {home_name}:
-" + "
-".join(team_goals_list)
+            summary += f"\n🥅 {team_name}:\n" + "\n".join(team_goals_list)
         if opp_goals_list:
-            summary += f"
-🥅 {opponent}:
-" + "
-".join(opp_goals_list)
+            summary += f"\n🥅 {opponent}:\n" + "\n".join(opp_goals_list)
 
         result.append(summary)
 
