@@ -63,7 +63,7 @@ if fixtures:
         title="Elo Puan Grafiği",
         xaxis_title="Tarih",
         yaxis_title="Elo Puanı",
-        yaxis=dict(range=[min_val - 10, max_val + 10]),
+        yaxis=dict(range=[min_val - 50, max_val + 50]),
         template="plotly_white"
     )
 
