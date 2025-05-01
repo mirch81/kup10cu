@@ -20,7 +20,6 @@ def get_goal_minutes(events, team_name):
     # Events içinde 'team' objesinin her zaman olduğundan emin olalım
     return [e['time']['minute'] for e in events if 'team' in e and e['type'] == 'Goal' and e['team']['name'] == team_name]
 
-
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
 
