@@ -56,19 +56,11 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         team_goals_list = get_team_goals(events, team_name)
         opp_goals_list = get_team_goals(events, opponent)
         if team_goals_list:
-            summary += "
-"
-            summary += f"
-🥅 {team_name}:
-" + "
-".join(team_goals_list)
+            summary += "\n"
+            summary += f"\n🥅 {team_name}:\n" + "\n".join(team_goals_list)
         if opp_goals_list:
-            summary += "
-"
-            summary += f"
-🥅 {opponent}:
-" + "
-".join(opp_goals_list)
+            summary += "\n"
+            summary += f"\n🥅 {opponent}:\n" + "\n".join(opp_goals_list)
 
         result.append(summary)
 
