@@ -58,7 +58,24 @@ html_code = f"""
         background-color: #f0f2f6;
     }}
 </style>
-{table_html}
+
+<div style="display: flex; justify-content: center;">
+<table class="compact-table">
+<thead>
+<tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
+</thead>
+<tbody>
+{''.join([
+    "<tr>" + "".join(
+        f"<td style='text-align: left;'>{cell}</td>" if i == 0 else f"<td>{cell}</td>"
+        for i, cell in enumerate(row)
+    ) + "</tr>"
+    for row in df_standings.values
+])}
+</tbody>
+</table>
+</div>
+
 """
 
 components.html(html_code, height=500, scrolling=True)
