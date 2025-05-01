@@ -51,7 +51,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # Güncellenmiş maç ismi ve takım ismi stilleri
+        # Maç ismini 5px daha büyük ve kalın yapıyoruz
         summary = f"<div style='font-weight:bold; font-size:25px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
         st.markdown(summary, unsafe_allow_html=True)
 
