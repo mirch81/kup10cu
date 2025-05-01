@@ -285,3 +285,4 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
             st.markdown(line, unsafe_allow_html=True)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
+        st.markdown("---")
