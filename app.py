@@ -125,7 +125,7 @@ if monthly_fixtures:
         {team_away} Maçlarındaki Toplam Gol Ortalaması: `{mac_away:.2f}`  
 
         **Maç Ortalama:** `{match_avg:.2f}`
-        """
+        """)
         st.markdown("---")
 
         kg_home = get_btts_ratio(all_fixtures, team_home)
