@@ -1,4 +1,5 @@
 from api import get_fixture_events
+import streamlit as st
 
 def get_goal_minutes(events, team_name):
     if not events:
