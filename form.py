@@ -50,18 +50,18 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        summary = f"{date} – {home_name} vs {away_name} {result_icon} | MS: {home_goals}-{away_goals}"
-        st.markdown(summary)
+        summary = f"<div style='font-weight:bold; font-size:20px'>{date} – {home_name} vs {away_name} {result_icon} | MS: {home_goals}-{away_goals}</div>"
+        st.markdown(summary, unsafe_allow_html=True)
 
         team_goals_list = get_team_goals(events, home_name)
         if team_goals_list:
-            st.markdown(f"🥅 {home_name} Golleri ")
+            st.markdown(f"**🥅 {home_name} Golleri**")
             for g in team_goals_list:
                 st.markdown(g)
 
         opp_goals_list = get_team_goals(events, away_name)
         if opp_goals_list:
-            st.markdown(f"🥅 {away_name} Golleri ")
+            st.markdown(f"**🥅 {away_name} Golleri**")
             for g in opp_goals_list:
                 st.markdown(g)
 
