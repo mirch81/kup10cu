@@ -88,12 +88,12 @@ if monthly_fixtures:
         {team_home} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_home:.1f}`  
         {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
         """)
-        if tahmin_skor_home > tahmin_skor_away:
-            st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
-        elif tahmin_skor_home < tahmin_skor_away:
-            st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
-        else:
-            st.markdown("➡️ Tahmin: **Beraberlik**")
+        if abs(tahmin_skor_home - tahmin_skor_away) < 15:
+    st.markdown("➡️ Tahmin: **Beraberlik**")
+elif tahmin_skor_home > tahmin_skor_away:
+    st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+else:
+    st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
 
         st.markdown("---")
 
@@ -103,12 +103,12 @@ if monthly_fixtures:
         {team_away} Skor: `{iy_score_away:.1f}`
         """)
 
-        if iy_score_home > iy_score_away:
-            st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
-        elif iy_score_home < iy_score_away:
-            st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
-        else:
-            st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+        if abs(iy_score_home - iy_score_away) < 15:
+    st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+elif iy_score_home > iy_score_away:
+    st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+else:
+    st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
         st.markdown("---")
 
         gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
