@@ -89,13 +89,12 @@ if monthly_fixtures:
         {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
         """)
         if abs(tahmin_skor_home - tahmin_skor_away) < 15:
-            st.markdown("➡️ Tahmin: **Beraberlik**")
+    st.markdown("➡️ Tahmin: **Beraberlik**")
 elif tahmin_skor_home > tahmin_skor_away:
     st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
 else:
     st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
-
-    st.markdown("---")
+st.markdown("---")
 
         st.markdown(f"""
         **İlk Yarı Sonucu Tahmini:**  
@@ -104,12 +103,12 @@ else:
         """)
 
         if abs(iy_score_home - iy_score_away) < 15:
-            st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+    st.markdown("➡️ Tahmin: **İlk yarı berabere**")
 elif iy_score_home > iy_score_away:
     st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
 else:
     st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
-    st.markdown("---")
+st.markdown("---")
 
         gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
         gol_away, mac_away = get_team_avg_goals(all_fixtures, team_away)
@@ -126,7 +125,7 @@ else:
 
         **Maç Ortalama:** `{match_avg:.2f}`
         """)
-        st.markdown("---")
+st.markdown("---")
 
         kg_home = get_btts_ratio(all_fixtures, team_home)
         kg_away = get_btts_ratio(all_fixtures, team_away)
@@ -147,8 +146,7 @@ Ortalama: `{kg_avg * 100:.0f}%`""")
             st.markdown("➡️ Tahmin: **2.5 ÜST**")
         else:
             st.markdown("➡️ Tahmin: **2.5 ALT**")
-
-        st.markdown("---")
+st.markdown("---")
 
         
 
