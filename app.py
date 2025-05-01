@@ -67,14 +67,14 @@ max_val = df_elo.max().max()
 
 fig = go.Figure()
 for team in df_elo.columns:
-fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
+  fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
 
-fig.update_layout(
-title="Elo Puan Grafiği",
-xaxis_title="Tarih",
-yaxis_title="Elo Puanı",
-yaxis=dict(range=[min_val - 10, max_val + 10]),
-template="plotly_white"
+  fig.update_layout(
+  title="Elo Puan Grafiği",
+  xaxis_title="Tarih",
+  yaxis_title="Elo Puanı",
+  yaxis=dict(range=[min_val - 10, max_val + 10]),
+  template="plotly_white"
 )
 
 st.plotly_chart(fig, use_container_width=True)
