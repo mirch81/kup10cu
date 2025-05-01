@@ -38,7 +38,31 @@ if standings:
     } for team in table])
 
     st.subheader("📋 Lig Puan Durumu")
-    st.dataframe(df_standings.reset_index(drop=True))
+    
+st.markdown("📋 **Lig Puan Durumu**", unsafe_allow_html=True)
+
+table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+st.markdown(
+    f'''
+    <style>
+        .compact-table {{
+            font-size: 14px;
+            border-collapse: collapse;
+        }}
+        .compact-table td, .compact-table th {{
+            padding: 6px 8px;
+            text-align: center;
+            white-space: nowrap;
+        }}
+        .compact-table th {{
+            background-color: #f0f2f6;
+        }}
+    </style>
+    {table_html}
+    ''',
+    unsafe_allow_html=True
+)
+
 
 if monthly_fixtures:
     match_options = [
