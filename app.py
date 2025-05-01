@@ -47,9 +47,11 @@ if fixtures:
     df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
     df_elo.set_index("date", inplace=True)
 
+    # Boşlukları kapat: bir takımın puanı yoksa son bilinen değerle doldur
+    df_elo.ffill(inplace=True)
+
     # 📊 Plotly çizgi grafiği
     st.subheader("📊 Elo Puan Grafiği")
-
     min_val = df_elo.min().min()
     max_val = df_elo.max().max()
 
