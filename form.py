@@ -20,7 +20,6 @@ def get_goal_minutes(events, team_name):
     # Verinin 'team' ve 'time' anahtarlarına sahip olup olmadığını kontrol et
     return [e['time']['minute'] for e in events if e.get('team') and e['type'] == 'Goal' and e['team'].get('name') == team_name]
 
-
 def get_team_last_matches(fixtures, team_name, max_matches=5):
     result = []
 
