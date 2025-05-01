@@ -37,7 +37,7 @@ if standings:
         "P": team['points']
     } for team in table])
 
-    st.subheader("📋 Lig Puan Durumu")
+    st.markdown("<h3 style='text-align: center;'>📋 Lig Puan Durumu</h3>", unsafe_allow_html=True)
     
 import streamlit.components.v1 as components
 
