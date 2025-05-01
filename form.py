@@ -1,5 +1,4 @@
 from api import get_fixture_events
-import streamlit as st
 
 def get_team_goals(events, team_name):
     goals = []
@@ -25,7 +24,6 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
         fixture_id = match['fixture']['id']
         events = get_fixture_events(fixture_id)
-    
 
         home = match['teams']['home']
         away = match['teams']['away']
@@ -44,30 +42,24 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
             team_goals = away_goals
             opp_goals = home_goals
 
-        if team_goals > opp_goals:
-            result_icon = "✅"
-        elif team_goals < opp_goals:
-            result_icon = "❌"
-        else:
-            result_icon = "🤝"
+        result_icon = "✅" if team_goals > opp_goals else "❌" if team_goals < opp_goals else "🤝"
 
-        # Maç ismini 5px daha büyük ve kalın yapıyoruz
+        # Bu satır sadece string olarak dönecek, Streamlit'e yazdırmayacak
         summary = f"<div style='font-weight:bold; font-size:20px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
-       
+
+        # Gol dakikalarını da append edelim
+        goal_info = ""
 
         team_goals_list = get_team_goals(events, home_name)
         opp_goals_list = get_team_goals(events, away_name)
-        
-        # Gol atan takımların isimlerini kalın yapıyoruz
-        if team_goals_list:
-            st.markdown(f"**🥅 {home_name}:**")
-            for g in team_goals_list:
-                st.markdown(g)
-        if opp_goals_list:
-            st.markdown(f"**🥅 {away_name}:**")
-            for g in opp_goals_list:
-                st.markdown(g)
 
-        result.append(summary)
+        if team_goals_list:
+            goal_info += f"<div><strong>🥅 {home_name}:</strong><br>" + "<br>".join(team_goals_list) + "</div>"
+        if opp_goals_list:
+            goal_info += f"<div><strong>🥅 {away_name}:</strong><br>" + "<br>".join(opp_goals_list) + "</div>"
+
+        # Toplam HTML'i ekle
+        full_html = summary + goal_info
+        result.append(full_html)
 
     return result
