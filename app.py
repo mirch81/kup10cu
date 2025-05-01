@@ -20,12 +20,18 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 # 4. Maç durumu seçimi
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# 👉 Tüm sezonun maçlarını çekiyoruz (ay parametresi yok!)
-season_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
+# 👉 Tüm sezonun maçlarını çekiyoruz
+season_fixtures = get_fixtures(league_name, year)
 
-# Maçları seçilen aya göre filtrele
+# Ay ve maç durumu filtresi
 fixtures = [
-    f for f in season_fixtures if f["fixture"]["date"][5:7] == str(month).zfill(2)
+    f for f in season_fixtures
+    if f["fixture"]["date"][5:7] == str(month).zfill(2)
+    and (
+        status_filter == "all"
+        or (status_filter == "played" and f["fixture"]["status"]["short"] in ["FT", "AET", "PEN"])
+        or (status_filter == "upcoming" and f["fixture"]["status"]["short"] == "NS")
+    )
 ]
 
 # 5. Maç seçimi
