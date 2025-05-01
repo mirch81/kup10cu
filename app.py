@@ -1,27 +1,24 @@
+
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))  # form.py'nin bulunduğu dizini ekle
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
-from form import get_team_last_matches
+from form import get_team_last_matches, get_form_score, get_first_half_form_score
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
-# Lig seçimi
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
 year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# Tüm sezon fikstürü (Elo için)
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
-
-# Ay bazlı filtrelenmiş fikstür (maç seçimi için)
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 if monthly_fixtures:
@@ -36,7 +33,6 @@ if monthly_fixtures:
     team_away = selected_fixture["teams"]["away"]["name"]
     league_id = selected_fixture["league"]["id"]
 
-    # Elo hesaplama – tüm sezon verisiyle
     history, _ = calculate_elo_history(all_fixtures, selected_league_id=league_id)
     team_home_history = history.get(team_home, [])
     team_away_history = history.get(team_away, [])
@@ -48,7 +44,6 @@ if monthly_fixtures:
     df_elo.set_index("date", inplace=True)
     df_elo.ffill(inplace=True)
 
-    # Elo Grafiği
     st.subheader("📊 Elo Puan Grafiği")
     min_val = df_elo.min().min()
     max_val = df_elo.max().max()
@@ -66,7 +61,86 @@ if monthly_fixtures:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # Son 5 Maç – Gol Dakikaları
+    # Tahmin motoru - Maç Sonucu
+    form_home = get_form_score(all_fixtures, team_home)
+    form_away = get_form_score(all_fixtures, team_away)
+
+    elo_home = team_home_history[-1][1] if team_home_history else 1500
+    elo_away = team_away_history[-1][1] if team_away_history else 1500
+
+    form_weight = 10
+
+    tahmin_skor_home = elo_home + form_home * form_weight
+    tahmin_skor_away = elo_away + form_away * form_weight
+
+    iy_home = get_first_half_form_score(all_fixtures, team_home)
+    iy_away = get_first_half_form_score(all_fixtures, team_away)
+    iy_weight = 10
+
+    iy_score_home = elo_home + iy_home * iy_weight
+    iy_score_away = elo_away + iy_away * iy_weight
+
+    st.subheader("🔮 Tahminler")
+
+with st.container():
+    st.markdown(f"""
+**Maç Sonucu Tahmini:**  
+{team_home} Skor: `{tahmin_skor_home:.1f}`  
+{team_away} Skor: `{tahmin_skor_away:.1f}`
+""")
+
+    if tahmin_skor_home > tahmin_skor_away:
+        st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+    elif tahmin_skor_home < tahmin_skor_away:
+        st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
+    else:
+        st.markdown("➡️ Tahmin: **Beraberlik**")
+
+    st.markdown("---")
+
+    st.markdown(f"""
+**İlk Yarı Sonucu Tahmini:**  
+{team_home} Skor: `{iy_score_home:.1f}`  
+{team_away} Skor: `{iy_score_away:.1f}`
+""")
+
+    if iy_score_home > iy_score_away:
+        st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+    elif iy_score_home < iy_score_away:
+        st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
+    else:
+        st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+
+    with st.container():
+        st.markdown(f"**Maç Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{tahmin_skor_home:.1f}`  
+"
+                    f"{team_away} Skor: `{tahmin_skor_away:.1f}`")
+
+        if tahmin_skor_home > tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+        elif tahmin_skor_home < tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
+        else:
+            st.markdown("➡️ Tahmin: **Beraberlik**")
+
+        st.markdown("---")
+
+        st.markdown(f"**İlk Yarı Sonucu Tahmini:**  
+"
+                    f"{team_home} Skor: `{iy_score_home:.1f}`  
+"
+                    f"{team_away} Skor: `{iy_score_away:.1f}`")
+
+        if iy_score_home > iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+        elif iy_score_home < iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
+        else:
+            st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+
+    # Son 5 maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
 
     col1, col2 = st.columns(2)
@@ -75,12 +149,12 @@ if monthly_fixtures:
         st.markdown(f"### {team_home}")
         summaries = get_team_last_matches(all_fixtures, team_home)
         for line in summaries:
-            st.markdown(line)
+            st.markdown(line, unsafe_allow_html=True)
 
     with col2:
         st.markdown(f"### {team_away}")
         summaries = get_team_last_matches(all_fixtures, team_away)
         for line in summaries:
-            st.markdown(line)
+            st.markdown(line, unsafe_allow_html=True)
 else:
     st.warning("Seçilen filtrelere göre maç bulunamadı.")
