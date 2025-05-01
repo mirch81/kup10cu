@@ -1,4 +1,3 @@
-
 import requests
 from config import BASE_URL, HEADERS
 
@@ -20,7 +19,6 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
     if not league_id:
         return []
 
-    # Avrupa kupaları için sezon = yıl, ligler için sezon = yıl - 1
     if league_id in [2, 3, 848]:
         season = year
     else:
@@ -32,7 +30,6 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
         "season": season
     }
 
-    # Eğer ay girildiyse tarih aralığı ekle
     if month:
         start_date = f"{year}-{str(month).zfill(2)}-01"
         if int(month) == 12:
@@ -52,3 +49,10 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
         fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] == "NS"]
 
     return fixtures
+
+def get_fixture_events(fixture_id):
+    url = f"{BASE_URL}/fixtures/events"
+    params = {"fixture": fixture_id}
+    response = requests.get(url, headers=HEADERS, params=params)
+    data = response.json()
+    return data.get("response", [])
