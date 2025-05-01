@@ -95,7 +95,7 @@ elif tahmin_skor_home > tahmin_skor_away:
 else:
     st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
 
-        st.markdown("---")
+    st.markdown("---")
 
         st.markdown(f"""
         **İlk Yarı Sonucu Tahmini:**  
@@ -109,7 +109,7 @@ elif iy_score_home > iy_score_away:
     st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
 else:
     st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
-        st.markdown("---")
+    st.markdown("---")
 
         gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
         gol_away, mac_away = get_team_avg_goals(all_fixtures, team_away)
