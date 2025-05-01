@@ -60,10 +60,10 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         opp_goals_min = get_goal_minutes(events, opponent)
         if team_goals_min:
             summary += "\n"
-            summary += f"\n🥅 {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
+            summary += f"\n {team_name}: " + ', '.join([str(g) + "'" for g in team_goals_min])
         if opp_goals_min:
             summary += "\n"
-            summary += f"\n🥅 {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
+            summary += f"\n {opponent}: " + ', '.join([str(g) + "'" for g in opp_goals_min])
 
         result.append(summary)
 
