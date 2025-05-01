@@ -39,29 +39,29 @@ if standings:
 
     st.subheader("📋 Lig Puan Durumu")
     
-st.markdown("📋 **Lig Puan Durumu**", unsafe_allow_html=True)
+import streamlit.components.v1 as components
 
 table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
-st.markdown(
-    f'''
-    <style>
-        .compact-table {{
-            font-size: 14px;
-            border-collapse: collapse;
-        }}
-        .compact-table td, .compact-table th {{
-            padding: 6px 8px;
-            text-align: center;
-            white-space: nowrap;
-        }}
-        .compact-table th {{
-            background-color: #f0f2f6;
-        }}
-    </style>
-    {table_html}
-    ''',
-    unsafe_allow_html=True
-)
+
+html_code = f"""
+<style>
+    .compact-table {{
+        font-size: 14px;
+        border-collapse: collapse;
+    }}
+    .compact-table td, .compact-table th {{
+        padding: 6px 8px;
+        text-align: center;
+        white-space: nowrap;
+    }}
+    .compact-table th {{
+        background-color: #f0f2f6;
+    }}
+</style>
+{table_html}
+"""
+
+components.html(html_code, height=500, scrolling=True)
 
 
 if monthly_fixtures:
