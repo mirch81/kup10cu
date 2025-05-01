@@ -89,7 +89,7 @@ if monthly_fixtures:
         {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
         """)
         if abs(tahmin_skor_home - tahmin_skor_away) < 15:
-    st.markdown("➡️ Tahmin: **Beraberlik**")
+            st.markdown("➡️ Tahmin: **Beraberlik**")
 elif tahmin_skor_home > tahmin_skor_away:
     st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
 else:
@@ -104,7 +104,7 @@ else:
         """)
 
         if abs(iy_score_home - iy_score_away) < 15:
-    st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+            st.markdown("➡️ Tahmin: **İlk yarı berabere**")
 elif iy_score_home > iy_score_away:
     st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
 else:
