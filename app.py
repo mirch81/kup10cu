@@ -61,7 +61,17 @@ html_code = f"""
     .compact-table {{
         background-color: white;
     }}
-</style>
+
+    </style>
+    <script>
+        window.addEventListener('load', function () {
+            const scrollable = document.querySelector('div[style*="overflow-x: auto"]');
+            if (scrollable) {
+                scrollable.scrollLeft = 0;
+            }
+        });
+    </script>
+
 
 
 <div style="overflow-x: auto; display: flex; justify-content: center; background-color: white;">
