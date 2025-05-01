@@ -72,7 +72,7 @@ html_code = f"""
 <tbody>
 {''.join([
     "<tr>" + "".join(
-        f"<td style='text-align: left;'>{cell}</td>" if i == 0 else f"<td>{cell}</td>"
+        f"<td style='text-align: left; padding-left: 4px;'>{cell}</td>" if i == 0 else f"<td>{cell}</td>"
         for i, cell in enumerate(row)
     ) + "</tr>"
     for row in df_standings.values
