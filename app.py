@@ -128,12 +128,13 @@ with st.container():
 
         st.markdown("---")
 
-        st.markdown(f"**İlk Yarı Sonucu Tahmini:**  
-"
-                    f"{team_home} Skor: `{iy_score_home:.1f}`  
-"
-                    f"{team_away} Skor: `{iy_score_away:.1f}`")
-""")
+        st.markdown(f"""
+        **İlk Yarı Sonucu Tahmini:**
+
+        {team_home} Skor: `{iy_score_home:.1f}`  
+        {team_away} Skor: `{iy_score_away:.1f}`
+        """)
+
         if iy_score_home > iy_score_away:
             st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
         elif iy_score_home < iy_score_away:
