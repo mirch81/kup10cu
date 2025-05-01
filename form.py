@@ -185,3 +185,24 @@ def get_team_avg_goals(fixtures, team_name, max_matches=5):
         total_scored / count if count else 0,
         total_goals / count if count else 0
     )
+
+def get_btts_ratio(fixtures, team_name, max_matches=5):
+    count = 0
+    btts = 0
+
+    played_matches = [
+        f for f in fixtures
+        if f['goals']['home'] is not None and f['goals']['away'] is not None
+        and (f['teams']['home']['name'] == team_name or f['teams']['away']['name'] == team_name)
+    ]
+
+    sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
+
+    for match in sorted_matches:
+        home_goals = match['goals']['home']
+        away_goals = match['goals']['away']
+        if home_goals > 0 and away_goals > 0:
+            btts += 1
+        count += 1
+
+    return btts / count if count > 0 else 0
