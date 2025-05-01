@@ -39,7 +39,7 @@ if standings:
     } for team in table])
 
     st.subheader("📋 Lig Puan Durumu")
-    st.dataframe(df_standings)
+    st.table(df_standings)
 
 if monthly_fixtures:
     match_options = [
