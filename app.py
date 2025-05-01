@@ -1,13 +1,13 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))  # form.py'nin bulunduğu dizini ekle
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
-from form import get_team_last_matches
+from form import get_team_last_matches, get_form_score
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
@@ -18,10 +18,8 @@ year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# Tüm sezon fikstürü (Elo için)
+# Fikstür çekme
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
-
-# Ay bazlı filtrelenmiş fikstür (maç seçimi için)
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 if monthly_fixtures:
@@ -36,7 +34,7 @@ if monthly_fixtures:
     team_away = selected_fixture["teams"]["away"]["name"]
     league_id = selected_fixture["league"]["id"]
 
-    # Elo hesaplama – tüm sezon verisiyle
+    # Elo hesaplama
     history, _ = calculate_elo_history(all_fixtures, selected_league_id=league_id)
     team_home_history = history.get(team_home, [])
     team_away_history = history.get(team_away, [])
@@ -66,7 +64,27 @@ if monthly_fixtures:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # Son 5 Maç – Gol Dakikaları
+    # 🔮 Tahmin Skoru (Elo + Form)
+    form_home = get_form_score(all_fixtures, team_home)
+    form_away = get_form_score(all_fixtures, team_away)
+
+    elo_home = team_home_history[-1][1] if team_home_history else 1500
+    elo_away = team_away_history[-1][1] if team_away_history else 1500
+
+    form_weight = 10
+
+    tahmin_skor_home = elo_home + form_home * form_weight
+    tahmin_skor_away = elo_away + form_away * form_weight
+
+    st.subheader("🔮 Maç Sonucu Tahmini")
+    if tahmin_skor_home > tahmin_skor_away:
+        st.markdown(f"**Tahmin: {team_home} kazanır**")
+    elif tahmin_skor_home < tahmin_skor_away:
+        st.markdown(f"**Tahmin: {team_away} kazanır**")
+    else:
+        st.markdown("**Tahmin: Beraberlik**")
+
+    # Son 5 Maç
     st.subheader("📋 Son 5 Maç – Gol Dakikaları")
 
     col1, col2 = st.columns(2)
