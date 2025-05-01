@@ -20,10 +20,15 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 # 4. Maç durumu seçimi
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# 5. Maçları çek
-fixtures = get_fixtures(league_name, year, month, status_filter)
+# 👉 Tüm sezonun maçlarını çekiyoruz (ay parametresi yok!)
+season_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
 
-# 6. Maç seçimi
+# Maçları seçilen aya göre filtrele
+fixtures = [
+    f for f in season_fixtures if f["fixture"]["date"][5:7] == str(month).zfill(2)
+]
+
+# 5. Maç seçimi
 if fixtures:
     match_options = [
         f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
@@ -32,12 +37,12 @@ if fixtures:
     selected_match = st.selectbox("Maç seçin", match_options)
     selected_fixture = fixtures[match_options.index(selected_match)]
 
-    # Elo grafiği
+    # Elo grafiği sezonun tamamına göre
     team_home = selected_fixture["teams"]["home"]["name"]
     team_away = selected_fixture["teams"]["away"]["name"]
     league_id = selected_fixture["league"]["id"]
 
-    history, _ = calculate_elo_history(fixtures, selected_league_id=league_id)
+    history, _ = calculate_elo_history(season_fixtures, selected_league_id=league_id)
     team_home_history = history.get(team_home, [])
     team_away_history = history.get(team_away, [])
 
@@ -46,8 +51,6 @@ if fixtures:
 
     df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
     df_elo.set_index("date", inplace=True)
-
-    # Boşlukları kapat: bir takımın puanı yoksa son bilinen değerle doldur
     df_elo.ffill(inplace=True)
 
     # 📊 Plotly çizgi grafiği
