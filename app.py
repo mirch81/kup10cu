@@ -5,6 +5,10 @@ import plotly.graph_objects as go
 from api import get_fixtures, SUPPORTED_LEAGUES
 from elo import calculate_elo_history
 from form import get_team_last_matches
+import sys
+sys.path.append('/mount/src/kup10cu')  # form.py dosyasının olduğu yolu ekle
+from form import get_team_last_matches
+
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
