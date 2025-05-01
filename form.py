@@ -1,3 +1,4 @@
+
 from api import get_fixture_events
 
 def get_team_goals(events, team_name):
@@ -44,12 +45,9 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
 
         result_icon = "✅" if team_goals > opp_goals else "❌" if team_goals < opp_goals else "🤝"
 
-        # Bu satır sadece string olarak dönecek, Streamlit'e yazdırmayacak
         summary = f"<br><div style='font-weight:bold; font-size:20px'>{date} – {team_name} vs {opponent} {result_icon} | MS: {home_goals}-{away_goals}</div>"
 
-        # Gol dakikalarını da append edelim
         goal_info = ""
-
         team_goals_list = get_team_goals(events, home_name)
         opp_goals_list = get_team_goals(events, away_name)
 
@@ -58,11 +56,11 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         if opp_goals_list:
             goal_info += f"<div><strong>🥅 {away_name}:</strong><br>" + "<br>".join(opp_goals_list) + "</div>"
 
-        # Toplam HTML'i ekle
         full_html = summary + goal_info
         result.append(full_html)
 
     return result
+
 def get_form_score(fixtures, team_name, max_matches=5):
     score = 0
     count = 0
@@ -76,14 +74,12 @@ def get_form_score(fixtures, team_name, max_matches=5):
     sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
 
     for match in sorted_matches:
-        home = match['teams']['home']
-        away = match['teams']['away']
-        home_name = home['name']
-        away_name = away['name']
+        home = match['teams']['home']['name']
+        away = match['teams']['away']['name']
         home_goals = match['goals']['home']
         away_goals = match['goals']['away']
 
-        if team_name == home_name:
+        if team_name == home:
             team_goals = home_goals
             opp_goals = away_goals
         else:
@@ -97,7 +93,42 @@ def get_form_score(fixtures, team_name, max_matches=5):
 
         count += 1
 
-    if count == 0:
-        return 0
+    return score / count if count else 0
 
-    return score / count
+def get_first_half_form_score(fixtures, team_name, max_matches=5):
+    score = 0
+    count = 0
+
+    played_matches = [
+        f for f in fixtures
+        if f['goals']['home'] is not None and f['goals']['away'] is not None
+        and (f['teams']['home']['name'] == team_name or f['teams']['away']['name'] == team_name)
+    ]
+
+    sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
+
+    for match in sorted_matches:
+        fixture_id = match['fixture']['id']
+        events = get_fixture_events(fixture_id)
+
+        home = match['teams']['home']['name']
+        away = match['teams']['away']['name']
+
+        home_iy = len([e for e in events if e.get('type') == 'Goal' and e.get('team', {}).get('name') == home and e.get('time', {}).get('elapsed', 46) < 46])
+        away_iy = len([e for e in events if e.get('type') == 'Goal' and e.get('team', {}).get('name') == away and e.get('time', {}).get('elapsed', 46) < 46])
+
+        if team_name == home:
+            team_iy = home_iy
+            opp_iy = away_iy
+        else:
+            team_iy = away_iy
+            opp_iy = home_iy
+
+        if team_iy > opp_iy:
+            score += 3
+        elif team_iy == opp_iy:
+            score += 1
+
+        count += 1
+
+    return score / count if count else 0
