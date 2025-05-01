@@ -1,5 +1,17 @@
 
-from collections import defaultdict
+import requests
+from config import BASE_URL, HEADERS
+import streamlit as st
+
+@st.cache_data(show_spinner=False)
+def load_match_with_events(fixture_id):
+    url = f"{BASE_URL}/fixtures"
+    params = {"id": fixture_id}
+    response = requests.get(url, headers=HEADERS, params=params)
+    data = response.json()
+    if data.get("response"):
+        return data["response"][0]
+    return None
 
 def get_goal_minutes(events, team_name):
     return [e['time']['minute'] for e in events if e['type'] == 'Goal' and e['team']['name'] == team_name]
@@ -16,14 +28,18 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
     sorted_matches = sorted(played_matches, key=lambda x: x['fixture']['date'], reverse=True)[:max_matches]
 
     for match in sorted(sorted_matches, key=lambda x: x['fixture']['date']):
-        home = match['teams']['home']
-        away = match['teams']['away']
+        match_detail = load_match_with_events(match['fixture']['id'])
+        if not match_detail:
+            continue
+
+        home = match_detail['teams']['home']
+        away = match_detail['teams']['away']
         home_name = home['name']
         away_name = away['name']
-        home_goals = match['goals']['home']
-        away_goals = match['goals']['away']
-        date = match['fixture']['date'][:10]
-        events = match.get('events', [])
+        home_goals = match_detail['goals']['home']
+        away_goals = match_detail['goals']['away']
+        events = match_detail.get('events', [])
+        date = match_detail['fixture']['date'][:10]
 
         if team_name == home_name:
             opponent = away_name
@@ -42,7 +58,7 @@ def get_team_last_matches(fixtures, team_name, max_matches=5):
         else:
             result_icon = "🤝"
 
-        # İlk yarı skoru hesapla (event'lerden)
+        # İlk yarı skoru event'lerden hesapla
         team_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == team_name and e['time']['elapsed'] <= 45])
         opp_first_half_goals = len([e for e in events if e['type'] == 'Goal' and e['team']['name'] == opponent and e['time']['elapsed'] <= 45])
 
