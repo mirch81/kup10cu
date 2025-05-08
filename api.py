@@ -2,17 +2,22 @@ import requests
 from config import BASE_URL, HEADERS
 
 # Lig ID'leri
-SUPPORTED_LEAGUES = {
+# En üste ekle
+LEAGUES = {
     "Premier League": 39,
     "La Liga": 140,
     "Bundesliga": 78,
     "Serie A": 135,
     "Ligue 1": 61,
     "Süper Lig": 203,
+}
+
+TOURNAMENTS = {
     "Şampiyonlar Ligi": 2,
     "Avrupa Ligi": 3,
     "Konferans Ligi": 848
 }
+
 
 def get_fixtures(league_name, year, month=None, status_filter="all"):
     league_id = SUPPORTED_LEAGUES.get(league_name)
