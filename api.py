@@ -19,10 +19,7 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
     if not league_id:
         return []
 
-    if league_id in [2, 3, 848]:
-        season = year
-    else:
-        season = year - 1
+    season = year - 1  # Tüm ligler için sezon = yıl - 1 olarak ayarlandı
 
     url = f"{BASE_URL}/fixtures"
     params = {
