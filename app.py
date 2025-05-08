@@ -13,35 +13,16 @@ from form import get_team_last_matches, get_form_score, get_first_half_form_scor
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
-
-SEASONS = ["2022/2023", "2023/2024", "2024/2025", "2025/2026"][::-1]
-MONTHS = {
-    "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12,
-    "Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5
-}
-
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
-selected_season = st.selectbox("Sezon seçin", SEASONS)
-season = int(selected_season.split("/")[0])
-selected_month_name = st.selectbox("Ay seçin", list(MONTHS.keys()))
-month = MONTHS[selected_month_name]
-
+year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
+month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-# Kodun geri kalanı buradan sonra entegre edilmeli...
-st.write("Kod başarıyla yüklendi. Buradan sonra analiz modülleri devreye alınabilir.")
-
-all_fixtures = get_fixtures(league_name, season, status_filter="all")
-league_id = SUPPORTED_LEAGUES[league_name]
-if league_id in [2, 3, 848]:  # Avrupa kupaları
-    upcoming = get_fixtures(league_name, season, status_filter="upcoming")
-    played = get_fixtures(league_name, season, status_filter="played")
-    monthly_fixtures = upcoming + played
-else:
-    monthly_fixtures = get_fixtures(league_name, season, month, status_filter=status_filter)
+all_fixtures = get_fixtures(league_name, year, status_filter="all")
+monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 
-standings = get_standings(league_name, season)
+standings = get_standings(league_name, year)
 if standings:
     table = standings[0]['league']['standings'][0]
     df_standings = pd.DataFrame([{
@@ -57,6 +38,7 @@ if standings:
     } for team in table])
 
     st.subheader("📋 Lig Puan Durumu")
+    
 import streamlit.components.v1 as components
 
 table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
@@ -100,6 +82,8 @@ html_code = f"""
 </div>
 
 """
+
+
 import streamlit.components.v1 as components
 
 html_code = f"""
