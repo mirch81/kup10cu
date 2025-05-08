@@ -47,8 +47,8 @@ except Exception as e:
     
 import streamlit.components.v1 as components
 
-    if df_standings is not None:
-        table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+if df_standings is not None:
+    table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
 
     html_code = f"""
     <style>
