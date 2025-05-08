@@ -9,7 +9,7 @@ SUPPORTED_LEAGUES = {
     "Serie A": 135,
     "Ligue 1": 61,
     "Süper Lig": 203,
-    "Şampiyonlar Ligi": 2,
+    "Şampiyonlar Ligi": 6281,
     "Avrupa Ligi": 3,
     "Konferans Ligi": 848
 }
