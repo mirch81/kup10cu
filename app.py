@@ -19,7 +19,13 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
-monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
+league_id = SUPPORTED_LEAGUES[league_name]
+if league_id in [2, 3, 848]:  # Avrupa kupaları
+    upcoming = get_fixtures(league_name, year, status_filter="upcoming")
+    played = get_fixtures(league_name, year, status_filter="played")
+    monthly_fixtures = upcoming + played
+else:
+    monthly_fixtures = get_fixtures(league_name, year, month, status_filter=status_filter)
 
 
 standings = get_standings(league_name, year)
