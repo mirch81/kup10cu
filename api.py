@@ -20,7 +20,7 @@ TOURNAMENTS = {
 
 
 def get_fixtures(league_name, year, month=None, status_filter="all"):
-    league_id = SUPPORTED_LEAGUES.get(league_name)
+    league_id = (LEAGUES | TOURNAMENTS).get(league_name)
     if not league_id:
         return []
 
@@ -64,7 +64,7 @@ def get_fixture_events(fixture_id):
 
 
 def get_standings(league_name, year):
-    league_id = SUPPORTED_LEAGUES.get(league_name)
+    league_id = (LEAGUES | TOURNAMENTS).get(league_name)
     season = year if league_id in [2, 3, 848] else year - 1
     url = f"{BASE_URL}/standings"
     params = {"league": league_id, "season": season}
