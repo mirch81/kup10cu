@@ -138,7 +138,7 @@ html_code = f"""
 </div>
 """
 
-    components.html(html_code, height=500, scrolling=True)
+components.html(html_code, height=500, scrolling=True)
 
 
 
