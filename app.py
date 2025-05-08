@@ -6,7 +6,6 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
 from api import get_fixtures, SUPPORTED_LEAGUES, get_standings
 from elo import calculate_elo_history
 from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches, get_team_avg_goals, get_btts_ratio
@@ -20,25 +19,14 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
-
-monthly_fixtures = []
-for fixture in all_fixtures:
-    try:
-        fixture_date = datetime.strptime(fixture['fixture']['date'][:10], "%Y-%m-%d")
-        if fixture_date.month == month:
-            monthly_fixtures.append(fixture)
-    except:
-        continue
-    monthly_fixtures = get_fixtures(league_name, year - 1, month, status_filter)
+monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 
 standings = get_standings(league_name, year)
-df_standings = None
-
-if standings and 'league' in standings[0] and 'standings' in standings[0]['league']:
+if standings:
     table = standings[0]['league']['standings'][0]
     df_standings = pd.DataFrame([{
-        "Takım": f"{team['rank']}. {team['team']['name']}",
+    "Takım": f"{team['rank']}. {team['team']['name']}",
         "O": team['all']['played'],
         "G": team['all']['win'],
         "B": team['all']['draw'],
@@ -48,48 +36,102 @@ if standings and 'league' in standings[0] and 'standings' in standings[0]['leagu
         "AV": team['goalsDiff'],
         "P": team['points']
     } for team in table])
+
     st.subheader("📋 Lig Puan Durumu")
+    
+import streamlit.components.v1 as components
 
-    table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
 
-    html_code = f"""
-    <style>
-        .compact-table {{
-            font-size: 14px;
-            border-collapse: collapse;
-        }}
-        .compact-table td, .compact-table th {{
-            padding: 6px 12px;
-            text-align: center;
-            white-space: nowrap;
-        }}
-        .compact-table th {{
-            background-color: #f0f2f6;
-        }}
-        .compact-table {{
-            background-color: white;
-        }}
-    </style>
+html_code = f"""
+<style>
+    .compact-table {{
+        font-size: 14px;
+        border-collapse: collapse;
+    }}
+    .compact-table td, .compact-table th {{
+        padding: 6px 12px;
+        text-align: center;
+        white-space: nowrap;
+    }}
+    .compact-table th {{
+        background-color: #f0f2f6;
+    }}
 
-    <div style="display: flex; justify-content: center; background-color: white;">
+    .compact-table {{
+        background-color: white;
+    }}
+</style>
+
+
+<div style="display: flex; justify-content: center; background-color: white;">
+<table class="compact-table">
+<thead>
+<tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
+</thead>
+<tbody>
+{''.join([
+    "<tr>" + "".join(
+        f"<td style='text-align: left; padding-left: 4px;'>{cell}</td>" if i == 0 else f"<td>{cell}</td>"
+        for i, cell in enumerate(row)
+    ) + "</tr>"
+    for row in df_standings.values
+])}
+</tbody>
+</table>
+</div>
+
+"""
+
+
+import streamlit.components.v1 as components
+
+html_code = f"""
+<style>
+    .compact-table {{
+        font-size: 14px;
+        border-collapse: collapse;
+        background-color: white;
+    }}
+    .compact-table td, .compact-table th {{
+        padding: 6px 12px;
+        text-align: center;
+        white-space: nowrap;
+    }}
+    .compact-table td:first-child {{
+        text-align: left;
+        padding-left: 4px;
+    }}
+</style>
+
+<script>
+    window.addEventListener('load', function () {{
+        const scrollable = document.querySelector('div.scroll-container');
+        if (scrollable) {{
+            scrollable.scrollLeft = 0;
+        }}
+    }});
+</script>
+
+<div class="scroll-container" style="overflow-x: auto; display: flex; justify-content: center; background-color: white;">
     <table class="compact-table">
-    <thead>
-    <tr>{{''.join([f"<th>{{col}}</th>" for col in df_standings.columns])}}</tr>
-    </thead>
-    <tbody>
-    {{''.join([
-        "<tr>" + "".join(
-            f"<td style='text-align: left; padding-left: 4px;'>{{cell}}</td>" if i == 0 else f"<td>{{cell}}</td>"
-            for i, cell in enumerate(row)
-        ) + "</tr>"
-        for row in df_standings.values
-    ])}}
-    </tbody>
+        <thead>
+            <tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
+        </thead>
+        <tbody>
+            {''.join([
+                "<tr>" + "".join(
+                    f"<td>{cell}</td>" if i != 0 else f"<td style='text-align: left; padding-left: 4px;'>{cell}</td>"
+                    for i, cell in enumerate(row)
+                ) + "</tr>"
+                for row in df_standings.values
+            ])}
+        </tbody>
     </table>
-    </div>
-    """
+</div>
+"""
 
-    components.html(html_code, height=500, scrolling=True)
+components.html(html_code, height=500, scrolling=True)
 
 
 
