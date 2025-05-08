@@ -1,3 +1,4 @@
+
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -11,6 +12,7 @@ from form import get_team_last_matches, get_form_score, get_first_half_form_scor
 
 st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
+
 
 SEASONS = ["2022/2023", "2023/2024", "2024/2025", "2025/2026"][::-1]
 MONTHS = {
