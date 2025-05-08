@@ -18,6 +18,18 @@ year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
+# ⬇️ BURAYA EKLE
+st.write("🧪 Test: Veriler geliyor mu?")
+test_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
+if not test_fixtures:
+    test_fixtures = get_fixtures(league_name, year - 1, status_filter=status_filter)
+
+st.write(f"Toplam maç bulundu: {len(test_fixtures)}")
+if test_fixtures:
+    st.write("İlk maç örneği:")
+    st.json(test_fixtures[0])
+
+
 all_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
 if not all_fixtures:
     all_fixtures = get_fixtures(league_name, year - 1, status_filter=status_filter)
