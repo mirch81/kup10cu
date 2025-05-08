@@ -22,26 +22,33 @@ all_fixtures = get_fixtures(league_name, year, status_filter="all")
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 
-standings = get_standings(league_name, year)
-if standings:
-    table = standings[0]['league']['standings'][0]
-    df_standings = pd.DataFrame([{
-    "Takım": f"{team['rank']}. {team['team']['name']}",
-        "O": team['all']['played'],
-        "G": team['all']['win'],
-        "B": team['all']['draw'],
-        "M": team['all']['lose'],
-        "A": team['all']['goals']['for'],
-        "Y": team['all']['goals']['against'],
-        "AV": team['goalsDiff'],
-        "P": team['points']
-    } for team in table])
 
-    st.subheader("📋 Lig Puan Durumu")
+standings = get_standings(league_name, year)
+df_standings = None
+
+try:
+    if standings and 'league' in standings[0] and 'standings' in standings[0]['league']:
+        table = standings[0]['league']['standings'][0]
+        df_standings = pd.DataFrame([{
+            "Takım": f"{team['rank']}. {team['team']['name']}",
+            "O": team['all']['played'],
+            "G": team['all']['win'],
+            "B": team['all']['draw'],
+            "M": team['all']['lose'],
+            "A": team['all']['goals']['for'],
+            "Y": team['all']['goals']['against'],
+            "AV": team['goalsDiff'],
+            "P": team['points']
+        } for team in table])
+        st.subheader("📋 Lig Puan Durumu")
+except Exception as e:
+    st.warning("Bu ligde standart puan durumu bulunamadı.")
+
     
 import streamlit.components.v1 as components
 
-table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+if df_standings is not None:
+    table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
 
 html_code = f"""
 <style>
@@ -131,7 +138,7 @@ html_code = f"""
 </div>
 """
 
-components.html(html_code, height=500, scrolling=True)
+    components.html(html_code, height=500, scrolling=True)
 
 
 
