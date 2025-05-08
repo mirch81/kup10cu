@@ -18,7 +18,9 @@ year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-all_fixtures = get_fixtures(league_name, year, status_filter="all")
+all_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
+if not all_fixtures:
+    all_fixtures = get_fixtures(league_name, year - 1, status_filter=status_filter)
 monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 
