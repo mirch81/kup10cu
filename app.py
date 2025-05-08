@@ -1,8 +1,6 @@
-
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -54,7 +52,6 @@ if standings:
     } for team in table])
 
     st.subheader("📋 Lig Puan Durumu")
-    
 import streamlit.components.v1 as components
 
 table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
@@ -98,8 +95,6 @@ html_code = f"""
 </div>
 
 """
-
-
 import streamlit.components.v1 as components
 
 html_code = f"""
