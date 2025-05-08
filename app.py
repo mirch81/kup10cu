@@ -23,10 +23,12 @@ monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
 
 
 standings = get_standings(league_name, year)
-if standings:
+df_standings = None
+
+if standings and 'league' in standings[0] and 'standings' in standings[0]['league']:
     table = standings[0]['league']['standings'][0]
     df_standings = pd.DataFrame([{
-    "Takım": f"{team['rank']}. {team['team']['name']}",
+        "Takım": f"{team['rank']}. {team['team']['name']}",
         "O": team['all']['played'],
         "G": team['all']['win'],
         "B": team['all']['draw'],
@@ -36,102 +38,48 @@ if standings:
         "AV": team['goalsDiff'],
         "P": team['points']
     } for team in table])
-
     st.subheader("📋 Lig Puan Durumu")
-    
-import streamlit.components.v1 as components
 
-table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+    table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
 
-html_code = f"""
-<style>
-    .compact-table {{
-        font-size: 14px;
-        border-collapse: collapse;
-    }}
-    .compact-table td, .compact-table th {{
-        padding: 6px 12px;
-        text-align: center;
-        white-space: nowrap;
-    }}
-    .compact-table th {{
-        background-color: #f0f2f6;
-    }}
-
-    .compact-table {{
-        background-color: white;
-    }}
-</style>
-
-
-<div style="display: flex; justify-content: center; background-color: white;">
-<table class="compact-table">
-<thead>
-<tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
-</thead>
-<tbody>
-{''.join([
-    "<tr>" + "".join(
-        f"<td style='text-align: left; padding-left: 4px;'>{cell}</td>" if i == 0 else f"<td>{cell}</td>"
-        for i, cell in enumerate(row)
-    ) + "</tr>"
-    for row in df_standings.values
-])}
-</tbody>
-</table>
-</div>
-
-"""
-
-
-import streamlit.components.v1 as components
-
-html_code = f"""
-<style>
-    .compact-table {{
-        font-size: 14px;
-        border-collapse: collapse;
-        background-color: white;
-    }}
-    .compact-table td, .compact-table th {{
-        padding: 6px 12px;
-        text-align: center;
-        white-space: nowrap;
-    }}
-    .compact-table td:first-child {{
-        text-align: left;
-        padding-left: 4px;
-    }}
-</style>
-
-<script>
-    window.addEventListener('load', function () {{
-        const scrollable = document.querySelector('div.scroll-container');
-        if (scrollable) {{
-            scrollable.scrollLeft = 0;
+    html_code = f"""
+    <style>
+        .compact-table {{
+            font-size: 14px;
+            border-collapse: collapse;
         }}
-    }});
-</script>
+        .compact-table td, .compact-table th {{
+            padding: 6px 12px;
+            text-align: center;
+            white-space: nowrap;
+        }}
+        .compact-table th {{
+            background-color: #f0f2f6;
+        }}
+        .compact-table {{
+            background-color: white;
+        }}
+    </style>
 
-<div class="scroll-container" style="overflow-x: auto; display: flex; justify-content: center; background-color: white;">
+    <div style="display: flex; justify-content: center; background-color: white;">
     <table class="compact-table">
-        <thead>
-            <tr>{''.join([f"<th>{col}</th>" for col in df_standings.columns])}</tr>
-        </thead>
-        <tbody>
-            {''.join([
-                "<tr>" + "".join(
-                    f"<td>{cell}</td>" if i != 0 else f"<td style='text-align: left; padding-left: 4px;'>{cell}</td>"
-                    for i, cell in enumerate(row)
-                ) + "</tr>"
-                for row in df_standings.values
-            ])}
-        </tbody>
+    <thead>
+    <tr>{{''.join([f"<th>{{col}}</th>" for col in df_standings.columns])}}</tr>
+    </thead>
+    <tbody>
+    {{''.join([
+        "<tr>" + "".join(
+            f"<td style='text-align: left; padding-left: 4px;'>{{cell}}</td>" if i == 0 else f"<td>{{cell}}</td>"
+            for i, cell in enumerate(row)
+        ) + "</tr>"
+        for row in df_standings.values
+    ])}}
+    </tbody>
     </table>
-</div>
-"""
+    </div>
+    """
 
-components.html(html_code, height=500, scrolling=True)
+    components.html(html_code, height=500, scrolling=True)
 
 
 
