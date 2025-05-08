@@ -1,14 +1,15 @@
 import requests
 from config import BASE_URL, HEADERS
 
-# Ligleri ve ulusal turnuvaları ayırdık
+# Lig ID'leri
+# En üste ekle
 LEAGUES = {
     "Premier League": 39,
     "La Liga": 140,
     "Bundesliga": 78,
     "Serie A": 135,
     "Ligue 1": 61,
-    "Süper Lig": 203
+    "Süper Lig": 203,
 }
 
 TOURNAMENTS = {
@@ -17,12 +18,13 @@ TOURNAMENTS = {
     "Konferans Ligi": 848
 }
 
+
 def get_fixtures(league_name, year, month=None, status_filter="all"):
     league_id = (LEAGUES | TOURNAMENTS).get(league_name)
     if not league_id:
         return []
 
-    if league_id in [2, 3, 848]:  # Avrupa turnuvaları
+    if league_id in [2, 3, 848]:
         season = year
     else:
         season = year - 1
@@ -34,18 +36,11 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
     }
 
     if month:
-        # Tarih yılını belirle
-        if league_id in [2, 3, 848]:  # Avrupa turnuvaları
-            date_year = year
-        else:
-            date_year = season
-
-        start_date = f"{date_year}-{str(month).zfill(2)}-01"
+        start_date = f"{year}-{str(month).zfill(2)}-01"
         if int(month) == 12:
-            end_date = f"{int(date_year)+1}-01-01"
+            end_date = f"{int(year)+1}-01-01"
         else:
-            end_date = f"{date_year}-{str(int(month)+1).zfill(2)}-01"
-
+            end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
         params["from"] = start_date
         params["to"] = end_date
 
@@ -66,6 +61,7 @@ def get_fixture_events(fixture_id):
     response = requests.get(url, headers=HEADERS, params=params)
     data = response.json()
     return data.get("response", [])
+
 
 def get_standings(league_name, year):
     league_id = (LEAGUES | TOURNAMENTS).get(league_name)
