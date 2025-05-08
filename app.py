@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from datetime import datetime
 from api import get_fixtures, SUPPORTED_LEAGUES, get_standings
 from elo import calculate_elo_history
 from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches, get_team_avg_goals, get_btts_ratio
@@ -19,8 +20,15 @@ month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
 all_fixtures = get_fixtures(league_name, year, status_filter="all")
-monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
-if not monthly_fixtures:
+
+monthly_fixtures = []
+for fixture in all_fixtures:
+    try:
+        fixture_date = datetime.strptime(fixture['fixture']['date'][:10], "%Y-%m-%d")
+        if fixture_date.month == month:
+            monthly_fixtures.append(fixture)
+    except:
+        continue
     monthly_fixtures = get_fixtures(league_name, year - 1, month, status_filter)
 
 
