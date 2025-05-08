@@ -13,6 +13,20 @@ st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
 
+SEASONS = ["2022/2023", "2023/2024", "2024/2025", "2025/2026"][::-1]
+MONTHS = {
+    "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12,
+    "Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5
+}
+
+league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
+selected_season = st.selectbox("Sezon seçin", SEASONS)
+season = int(selected_season.split("/")[0])
+selected_month_name = st.selectbox("Ay seçin", list(MONTHS.keys()))
+month = MONTHS[selected_month_name]
+
+
+
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
 all_fixtures = get_fixtures(league_name, season, status_filter="all")
