@@ -1,7 +1,5 @@
-
 import requests
 from config import BASE_URL, HEADERS
-from datetime import datetime
 
 # Lig ID'leri
 SUPPORTED_LEAGUES = {
@@ -21,17 +19,8 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
     if not league_id:
         return []
 
-    today = datetime.today()
-    current_year = today.year
-    current_month = today.month
-
-    if current_month < 7:
-        season_guess = current_year - 1
-    else:
-        season_guess = current_year
-
     if league_id in [2, 3, 848]:
-        season = season_guess
+        season = year
     else:
         season = year - 1
 
@@ -42,11 +31,11 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
     }
 
     if month:
-        start_date = f"{season}-{str(month).zfill(2)}-01"
+        start_date = f"{year}-{str(month).zfill(2)}-01"
         if int(month) == 12:
-            end_date = f"{season+1}-01-01"
+            end_date = f"{int(year)+1}-01-01"
         else:
-            end_date = f"{season}-{str(int(month)+1).zfill(2)}-01"
+            end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
         params["from"] = start_date
         params["to"] = end_date
 
@@ -68,23 +57,10 @@ def get_fixture_events(fixture_id):
     data = response.json()
     return data.get("response", [])
 
+
 def get_standings(league_name, year):
     league_id = SUPPORTED_LEAGUES.get(league_name)
-
-    today = datetime.today()
-    current_year = today.year
-    current_month = today.month
-
-    if current_month < 7:
-        season_guess = current_year - 1
-    else:
-        season_guess = current_year
-
-    if league_id in [2, 3, 848]:
-        season = season_guess
-    else:
-        season = year - 1
-
+    season = year if league_id in [2, 3, 848] else year - 1
     url = f"{BASE_URL}/standings"
     params = {"league": league_id, "season": season}
     response = requests.get(url, headers=HEADERS, params=params)
