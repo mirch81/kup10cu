@@ -30,6 +30,7 @@ def get_fixtures(league_name, year, month=None, status_filter="all"):
         "season": season
     }
 
+    
     if month:
         start_date = f"{year}-{str(month).zfill(2)}-01"
         if int(month) == 12:
