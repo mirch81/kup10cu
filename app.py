@@ -14,21 +14,31 @@ st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
-year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
-month = st.selectbox("Ay seçin", list(range(1, 13)))
+
+SEASONS = ["2022/2023", "2023/2024", "2024/2025", "2025/2026"][::-1]
+MONTHS = {
+    "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12,
+    "Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5
+}
+
+selected_season = st.selectbox("Sezon seçin", SEASONS)
+season = int(selected_season.split("/")[0])
+selected_month_name = st.selectbox("Ay seçin", list(MONTHS.keys()))
+month = MONTHS[selected_month_name]
+
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-all_fixtures = get_fixtures(league_name, year, status_filter="all")
+all_fixtures = get_fixtures(league_name, season, status_filter="all")
 league_id = SUPPORTED_LEAGUES[league_name]
 if league_id in [2, 3, 848]:  # Avrupa kupaları
-    upcoming = get_fixtures(league_name, year, status_filter="upcoming")
-    played = get_fixtures(league_name, year, status_filter="played")
+    upcoming = get_fixtures(league_name, season, status_filter="upcoming")
+    played = get_fixtures(league_name, season, status_filter="played")
     monthly_fixtures = upcoming + played
 else:
-    monthly_fixtures = get_fixtures(league_name, year, month, status_filter=status_filter)
+    monthly_fixtures = get_fixtures(league_name, season, month, status_filter=status_filter)
 
 
-standings = get_standings(league_name, year)
+standings = get_standings(league_name, season)
 if standings:
     table = standings[0]['league']['standings'][0]
     df_standings = pd.DataFrame([{
