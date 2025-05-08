@@ -80,7 +80,7 @@ if standings and 'league' in standings[0] and 'standings' in standings[0]['leagu
     </table>
     </div>
     """
-    import streamlit.components.v1 as components
+
     components.html(html_code, height=500, scrolling=True)
 
 
