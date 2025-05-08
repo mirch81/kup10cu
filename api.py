@@ -1,68 +1,256 @@
-import requests
-from config import BASE_URL, HEADERS
 
-# Lig ID'leri
-SUPPORTED_LEAGUES = {
-    "Premier League": 39,
-    "La Liga": 140,
-    "Bundesliga": 78,
-    "Serie A": 135,
-    "Ligue 1": 61,
-    "Süper Lig": 203,
-    "Şampiyonlar Ligi": 2,
-    "Avrupa Ligi": 3,
-    "Konferans Ligi": 848
-}
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-def get_fixtures(league_name, year, month=None, status_filter="all"):
-    league_id = SUPPORTED_LEAGUES.get(league_name)
-    if not league_id:
-        return []
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+from api import get_fixtures, SUPPORTED_LEAGUES, get_standings
+from elo import calculate_elo_history
+from form import get_team_last_matches, get_form_score, get_first_half_form_score, get_avg_goals_last_matches, get_team_avg_goals, get_btts_ratio
 
-    if league_id in [2, 3, 848]:
-        season = year
-    else:
-        season = year - 1
+st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
+st.title("⚽ Futbol Tahmin Asistanı")
 
-    url = f"{BASE_URL}/fixtures"
-    params = {
-        "league": league_id,
-        "season": season
-    }
+league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
+year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
+month = st.selectbox("Ay seçin", list(range(1, 13)))
+status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
-    if month:
-        start_date = f"{year}-{str(month).zfill(2)}-01"
-        if int(month) == 12:
-            end_date = f"{int(year)+1}-01-01"
+all_fixtures = get_fixtures(league_name, year, status_filter=status_filter)
+if not all_fixtures:
+    all_fixtures = get_fixtures(league_name, year - 1, status_filter=status_filter)
+monthly_fixtures = get_fixtures(league_name, year, month, status_filter)
+if not monthly_fixtures:
+    monthly_fixtures = get_fixtures(league_name, year - 1, month, status_filter)
+
+
+
+standings = get_standings(league_name, year)
+df_standings = None
+
+try:
+    if standings and 'league' in standings[0] and 'standings' in standings[0]['league']:
+        table = standings[0]['league']['standings'][0]
+        df_standings = pd.DataFrame([{
+            "Takım": f"{team['rank']}. {team['team']['name']}",
+            "O": team['all']['played'],
+            "G": team['all']['win'],
+            "B": team['all']['draw'],
+            "M": team['all']['lose'],
+            "A": team['all']['goals']['for'],
+            "Y": team['all']['goals']['against'],
+            "AV": team['goalsDiff'],
+            "P": team['points']
+        } for team in table])
+        st.subheader("📋 Lig Puan Durumu")
+except Exception as e:
+    st.warning("Bu ligde standart puan durumu bulunamadı.")
+
+    
+import streamlit.components.v1 as components
+
+if df_standings is not None:
+    table_html = df_standings.to_html(index=False, classes="compact-table", border=0)
+
+if df_standings is not None:
+    html_code = f"""
+    <style>
+        .compact-table {{
+            font-size: 14px;
+            border-collapse: collapse;
+            background-color: white;
+        }}
+        .compact-table td, .compact-table th {{
+            padding: 6px 12px;
+            text-align: center;
+            white-space: nowrap;
+        }}
+        .compact-table td:first-child {{
+            text-align: left;
+            padding-left: 4px;
+        }}
+    </style>
+
+    <script>
+        window.addEventListener('load', function () {{
+            const scrollable = document.querySelector('div.scroll-container');
+            if (scrollable) {{
+                scrollable.scrollLeft = 0;
+            }}
+        }});
+    </script>
+
+    <div class="scroll-container" style="overflow-x: auto; display: flex; justify-content: center; background-color: white;">
+        <table class="compact-table">
+            <thead>
+                <tr>{{''.join([f"<th>{{col}}</th>" for col in df_standings.columns])}}</tr>
+            </thead>
+            <tbody>
+                {{''.join([
+                    "<tr>" + "".join(
+                        f"<td>{{cell}}</td>" if i != 0 else f"<td style='text-align: left; padding-left: 4px;'>{{cell}}</td>"
+                        for i, cell in enumerate(row)
+                    ) + "</tr>"
+                    for row in df_standings.values
+                ])}}
+            </tbody>
+        </table>
+    </div>
+    """
+    components.html(html_code, height=500, scrolling=True)
+
+
+
+if monthly_fixtures:
+    match_options = [
+        f"{f['teams']['home']['name']} vs {f['teams']['away']['name']} - {f['fixture']['date'][:10]}"
+        for f in monthly_fixtures
+    ]
+    selected_match = st.selectbox("Maç seçin", match_options)
+    selected_fixture = monthly_fixtures[match_options.index(selected_match)]
+
+    team_home = selected_fixture["teams"]["home"]["name"]
+    team_away = selected_fixture["teams"]["away"]["name"]
+    league_id = selected_fixture["league"]["id"]
+
+    history, _ = calculate_elo_history(all_fixtures, selected_league_id=league_id)
+    team_home_history = history.get(team_home, [])
+    team_away_history = history.get(team_away, [])
+
+    df_home = pd.DataFrame(team_home_history, columns=["date", team_home])
+    df_away = pd.DataFrame(team_away_history, columns=["date", team_away])
+
+    df_elo = pd.merge(df_home, df_away, on="date", how="outer").sort_values("date")
+    df_elo.set_index("date", inplace=True)
+    df_elo.ffill(inplace=True)
+
+    st.subheader("📊 Elo Puan Grafiği")
+    min_val = df_elo.min().min()
+    max_val = df_elo.max().max()
+
+    fig = go.Figure()
+    for team in df_elo.columns:
+        fig.add_trace(go.Scatter(x=df_elo.index, y=df_elo[team], mode='lines+markers', name=team))
+
+    fig.update_layout(
+        title="Elo Puan Grafiği",
+        xaxis_title="Tarih",
+        yaxis_title="Elo Puanı",
+        yaxis=dict(range=[min_val - 10, max_val + 10]),
+        template="plotly_white"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Tahmin motoru - Maç Sonucu
+    form_home = get_form_score(all_fixtures, team_home)
+    form_away = get_form_score(all_fixtures, team_away)
+
+    elo_home = team_home_history[-1][1] if team_home_history else 1500
+    elo_away = team_away_history[-1][1] if team_away_history else 1500
+
+    form_weight = 10
+
+    tahmin_skor_home = elo_home + form_home * form_weight
+    tahmin_skor_away = elo_away + form_away * form_weight
+
+    iy_home = get_first_half_form_score(all_fixtures, team_home)
+    iy_away = get_first_half_form_score(all_fixtures, team_away)
+    iy_weight = 10
+
+    iy_score_home = elo_home + iy_home * iy_weight
+    iy_score_away = elo_away + iy_away * iy_weight
+
+    st.subheader("🔮 Tahminler")
+
+    with st.container():
+        st.markdown(f"""
+        **Maç Sonucu Tahmini:**  
+        {team_home} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_home:.1f}`  
+        {team_away} Elo ve Son 5 Maç Sonucu Skor: `{tahmin_skor_away:.1f}`
+        """)
+        if tahmin_skor_home > tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} kazanır**")
+        elif tahmin_skor_home < tahmin_skor_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} kazanır**")
         else:
-            end_date = f"{year}-{str(int(month)+1).zfill(2)}-01"
-        params["from"] = start_date
-        params["to"] = end_date
+                st.markdown("➡️ Tahmin: **Beraberlik**")
 
-    response = requests.get(url, headers=HEADERS, params=params)
-    data = response.json()
+        st.markdown("---")
 
-    fixtures = data.get("response", [])
-    if status_filter == "played":
-        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] in ["FT", "AET", "PEN"]]
-    elif status_filter == "upcoming":
-        fixtures = [f for f in fixtures if f["fixture"]["status"]["short"] == "NS"]
+        st.markdown(f"""
+        **İlk Yarı Sonucu Tahmini:**  
+        {team_home} Skor: `{iy_score_home:.1f}`  
+        {team_away} Skor: `{iy_score_away:.1f}`
+        """)
 
-    return fixtures
+        if iy_score_home > iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_home} ilk yarıyı önde kapatır**")
+        elif iy_score_home < iy_score_away:
+            st.markdown(f"➡️ Tahmin: **{team_away} ilk yarıyı önde kapatır**")
+        else:
+                st.markdown("➡️ Tahmin: **İlk yarı berabere**")
+        st.markdown("---")
 
-def get_fixture_events(fixture_id):
-    url = f"{BASE_URL}/fixtures/events"
-    params = {"fixture": fixture_id}
-    response = requests.get(url, headers=HEADERS, params=params)
-    data = response.json()
-    return data.get("response", [])
+        gol_home, mac_home = get_team_avg_goals(all_fixtures, team_home)
+        gol_away, mac_away = get_team_avg_goals(all_fixtures, team_away)
+        match_avg = (mac_home + mac_away) / 2
+
+        st.markdown(f"""
+        **2.5 Alt/Üst Tahmini:**
+
+        {team_home}'ın attığı Gol Ortalaması: `{gol_home:.2f}`  
+        {team_home} Maçlarındaki Toplam Gol Ortalaması: `{mac_home:.2f}`  
+
+        {team_away}'ın attığı Gol Ortalaması: `{gol_away:.2f}`  
+        {team_away} Maçlarındaki Toplam Gol Ortalaması: `{mac_away:.2f}`  
+
+        **Maç Ortalama:** `{match_avg:.2f}`
+        """)
+        st.markdown("---")
+
+        kg_home = get_btts_ratio(all_fixtures, team_home)
+        kg_away = get_btts_ratio(all_fixtures, team_away)
+        kg_avg = (kg_home + kg_away) / 2
+
+        st.markdown(f"""**Karşılıklı Gol (KG) Tahmini:**
+{team_home} Son 5 Maçta KG: `{kg_home * 100:.0f}%`
+{team_away} Son 5 Maçta KG: `{kg_away * 100:.0f}%`
+Ortalama: `{kg_avg * 100:.0f}%`""")
+
+        if kg_avg > 0.5:
+            st.markdown("➡️ Tahmin: **KG VAR**")
+        else:
+                st.markdown("➡️ Tahmin: **KG YOK**")
 
 
-def get_standings(league_name, year):
-    league_id = SUPPORTED_LEAGUES.get(league_name)
-    season = year if league_id in [2, 3, 848] else year - 1
-    url = f"{BASE_URL}/standings"
-    params = {"league": league_id, "season": season}
-    response = requests.get(url, headers=HEADERS, params=params)
-    data = response.json()
-    return data.get("response", [])
+        if match_avg > 2.5:
+            st.markdown("➡️ Tahmin: **2.5 ÜST**")
+        else:
+                st.markdown("➡️ Tahmin: **2.5 ALT**")
+
+        st.markdown("---")
+
+        
+
+    # Son 5 maç
+    st.subheader("📋 Son 5 Maç – Gol Dakikaları")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown(f"### {team_home}")
+        summaries = get_team_last_matches(all_fixtures, team_home)
+        for line in summaries:
+            st.markdown(line, unsafe_allow_html=True)
+        st.markdown("---")
+
+    with col2:
+        st.markdown(f"### {team_away}")
+        summaries = get_team_last_matches(all_fixtures, team_away)
+        for line in summaries:
+            st.markdown(line, unsafe_allow_html=True)
+        st.markdown("---")
+else:
+    st.warning("Seçilen filtrelere göre maç bulunamadı.")
