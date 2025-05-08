@@ -14,7 +14,8 @@ st.set_page_config(page_title="Futbol Tahmin Asistanı", layout="wide")
 st.title("⚽ Futbol Tahmin Asistanı")
 
 league_name = st.selectbox("Lig seçin", list(SUPPORTED_LEAGUES.keys()))
-year = st.selectbox("Yıl seçin", list(range(2020, 2026))[::-1])
+season_label = st.selectbox("Sezon seçin", ["2020/2021", "2021/2022", "2022/2023", "2023/2024", "2024/2025"])
+year = int(season_label.split("/")[0])
 month = st.selectbox("Ay seçin", list(range(1, 13)))
 status_filter = st.selectbox("Maç durumu", ["all", "played", "upcoming"])
 
